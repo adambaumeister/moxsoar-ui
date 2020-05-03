@@ -1,7 +1,12 @@
+// boilerplate?
 import React from 'react';
 import ReactDOM from 'react-dom';
+// Import our actual app
+import App from './component/App'
+// Add bootstrap
+import 'bootstrap/dist/css/bootstrap.css';
+// Add some defaults
 import './index.css';
-import App from './App';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
