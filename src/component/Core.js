@@ -1,11 +1,12 @@
 import React from 'react';
 import './core.css'
 import logo from '../moxsoar_logo.svg'
+import Moxsoar from '../api/moxsoar'
 
 class LoginButton extends React.Component {
     render() {
         return (
-            <button type="button" class="btn btn-primary">
+            <button type="submit" className="btn btn-primary">
                 Login
             </button>
         )
@@ -13,26 +14,44 @@ class LoginButton extends React.Component {
 }
 
 class TextInput extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
     render() {
         return(
-            <div class="input-group mb-3">
+            <div className="input-group mb-3">
                 <div className="input-group-prepend">
-                    <span class="input-group-text">{this.props.fieldName}</span>
+                    <span className="input-group-text">{this.props.fieldName}</span>
                 </div>
-                <input type="text" class="form-control" aria-label={this.props.fieldName} aria-describedby="basic-addon1"/>
+                <input type={this.props.type || "text"} className="form-control" aria-label={this.props.fieldName} name={this.props.fieldName} aria-describedby="basic-addon1"/>
             </div>
         ) 
     }
 }
 
 class LoginForm extends React.Component {
+    constructor(props) {
+        super(props);
+        this.reactStringify = this.reactStringify.bind(this)
+    }
+
+    reactStringify(e) {
+        e.preventDefault();
+        var data = new FormData(e.target);
+        var m = new Moxsoar();
+        m.Auth(data.get("Username"), data.get("Password"));
+        
+    }
 
     render() {
         return (
             <div className="m-4 text-center">
-                <TextInput fieldName='Username'/>
-                <TextInput fieldName='Password'/>
-                <LoginButton/>
+                <form onSubmit={this.reactStringify}>
+                    <TextInput fieldName='Username'/>
+                    <TextInput fieldName='Password' type='password'/>
+                    <LoginButton/>
+                </form>
             </div>
         )
     }
