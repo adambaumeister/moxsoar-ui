@@ -6,7 +6,7 @@ export default class Moxsoar {
         this.url = "http://localhost:8080";
     }
 
-    Auth(username, password) {
+    Auth(username, password, cb, obj) {
 
         var b = {
             "username": username,
@@ -26,16 +26,18 @@ export default class Moxsoar {
             .then(
                 (result) => {
                     r.SetJson(result);
-                    return r;
+                    cb(obj, r);
                 },
                 // Note: it's important to handle errors here
                 // instead of a catch() block so that we don't swallow
                 // exceptions from actual bugs in components.
                 (error) => {
                     r.SetError(error);
+                    cb(obj, r);
+
                 }
             )
-    }
+        }
 }
 
 export class MoxsoarResponse {

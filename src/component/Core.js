@@ -30,18 +30,45 @@ class TextInput extends React.Component {
     }
 }
 
+class StatusBar extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        var style; 
+        if (this.props.show) {
+            style = {display: 'block'};
+        } else {
+            style = {display: 'none'};
+        }
+        return (
+            <div className={this.props.type} style={style}>{this.props.msg}</div>
+        )
+    }
+}
+
 class LoginForm extends React.Component {
     constructor(props) {
         super(props);
         this.reactStringify = this.reactStringify.bind(this)
+        this.state = {
+            failed: false,
+            failMessage: ''
+        }
     }
 
     reactStringify(e) {
         e.preventDefault();
         var data = new FormData(e.target);
         var m = new Moxsoar();
-        m.Auth(data.get("Username"), data.get("Password"));
-        
+        // Here we pass authcb as a callback so it works in the async code
+        var r = m.Auth(data.get("Username"), data.get("Password"), this.authcb, this);
+    }
+
+    authcb(self, result) {
+        console.log(result);
+        self.setState({failed: true, failMessage: result.error});
     }
 
     render() {
@@ -51,6 +78,7 @@ class LoginForm extends React.Component {
                     <TextInput fieldName='Username'/>
                     <TextInput fieldName='Password' type='password'/>
                     <LoginButton/>
+                    <StatusBar show={this.state.failed} type="alert alert-danger" msg={this.state.failMessage}/>
                 </form>
             </div>
         )
