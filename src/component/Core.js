@@ -1,7 +1,9 @@
 import React from 'react';
-import './core.css'
-import logo from '../moxsoar_logo.svg'
-import Moxsoar from '../api/moxsoar'
+import './core.css';
+import logo from '../moxsoar_logo.svg';
+import Moxsoar from '../api/moxsoar';
+import GetCookie from '../funcs/cookies';
+import Main from './Packs';
 
 class LoginButton extends React.Component {
     render() {
@@ -110,9 +112,18 @@ export class Container extends React.Component {
     constructor(props) {
         super(props)
         this.setLoggedIn = this.setLoggedIn.bind(this);
-        this.state = {
-            loggedIn: false
+        var cookie = GetCookie('token');
+
+        if (cookie) {
+            this.state = {
+                loggedIn: true
+            }
+        } else {
+            this.state = {
+                loggedIn: false
+            }
         }
+
     }
 
     // We need to pass self in, as this is accessed within a callback function.
@@ -124,7 +135,6 @@ export class Container extends React.Component {
     }
 
     render() {
-        var cookies = document.cookie;
 
         var userNotLoggedIn =
             <div className="container h-100">
@@ -133,12 +143,13 @@ export class Container extends React.Component {
         
         var userLoggedIn = 
             <div className="container h-100">
-                {cookies}
+                <Main/>
             </div>
 
         if (this.state.loggedIn) {
             return(userLoggedIn);
         } else {
+
             return(userNotLoggedIn);
         }
 

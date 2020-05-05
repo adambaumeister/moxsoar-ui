@@ -35,12 +35,39 @@ export default class Moxsoar {
                 }
             )
         }
+
+        GetPacks(obj) {
+    
+            var r = new MoxsoarResponse();
+            fetch("/packs", {
+                method: 'get'
+            })
+                .then(function (response) {
+                    r.SetResponse(response);
+    
+                    return response.json()
+                })
+                .then(
+                    (result) => {
+                        r.SetJson(result);
+                        obj.addPacks(r);
+                    },
+                    // Note: it's important to handle errors here
+                    // instead of a catch() block so that we don't swallow
+                    // exceptions from actual bugs in components.
+                    (error) => {
+                        r.SetError(error);
+                        obj.addPacks(r);
+                    }
+                )
+            }    
 }
 
 export class MoxsoarResponse {
     constructor() {
         this.failed = false;
         this.error = '';
+        this.json = {};
     }
 
     SetResponse(response) {
@@ -51,6 +78,8 @@ export class MoxsoarResponse {
         if (this.response.status == 401) {
             var msg = json['Message'];
             this.SetError(msg);
+        } else {
+            this.json = json;
         }
     }
 
