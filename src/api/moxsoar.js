@@ -2,11 +2,9 @@
 
 export default class Moxsoar {
     constructor() {
-        // Default URL for development
-        this.url = "http://localhost:8080";
     }
 
-    Auth(username, password, cb, obj) {
+    Auth(username, password, obj) {
 
         var b = {
             "username": username,
@@ -14,9 +12,9 @@ export default class Moxsoar {
         }
 
         var r = new MoxsoarResponse();
-        fetch(this.url + "/auth", {
+        fetch("/auth", {
             method: 'post',
-            body: JSON.stringify(b)
+            body: JSON.stringify(b),
         })
             .then(function (response) {
                 r.SetResponse(response);
@@ -26,15 +24,14 @@ export default class Moxsoar {
             .then(
                 (result) => {
                     r.SetJson(result);
-                    cb(obj, r);
+                    obj.authcb(r);
                 },
                 // Note: it's important to handle errors here
                 // instead of a catch() block so that we don't swallow
                 // exceptions from actual bugs in components.
                 (error) => {
                     r.SetError(error);
-                    cb(obj, r);
-
+                    obj.authcb(r);
                 }
             )
         }

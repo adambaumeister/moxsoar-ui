@@ -49,6 +49,9 @@ class StatusBar extends React.Component {
 }
 
 class LoginForm extends React.Component {
+    /*
+    Good example of an API based form that uses an external class and the async fetch to work
+    */
     constructor(props) {
         super(props);
         this.reactStringify = this.reactStringify.bind(this)
@@ -63,12 +66,16 @@ class LoginForm extends React.Component {
         var data = new FormData(e.target);
         var m = new Moxsoar();
         // Here we pass authcb as a callback so it works in the async code
-        var r = m.Auth(data.get("Username"), data.get("Password"), this.authcb, this);
+        // We also have to pass this into the callback so it can access it.
+        var r = m.Auth(data.get("Username"), data.get("Password"), this);
     }
 
-    authcb(self, result) {
-        console.log(result);
-        self.setState({failed: true, failMessage: result.error});
+    authcb(result) {
+        if (result.failed) {
+            this.setState({failed: true, failMessage: result.error});
+        } else {
+            this.props.onlogin();
+        }
     }
 
     render() {
@@ -78,7 +85,7 @@ class LoginForm extends React.Component {
                     <TextInput fieldName='Username'/>
                     <TextInput fieldName='Password' type='password'/>
                     <LoginButton/>
-                    <StatusBar show={this.state.failed} type="alert alert-danger" msg={this.state.failMessage}/>
+                    <StatusBar show={this.state.failed} type="alert alert-danger mt-4 fade show" msg={this.state.failMessage}/>
                 </form>
             </div>
         )
@@ -87,13 +94,12 @@ class LoginForm extends React.Component {
 
 class LoginBox extends React.Component {
     render() {
-        var loggedIn = false;
         return(
             <div className="row h-100 justify-content-center align-items-center">
                 <div className="card middle-box">
                     <img src={logo} height='50px' className="mt-4"></img>
 
-                    <LoginForm/>
+                    <LoginForm onlogin={this.props.onlogin} />
                 </div>
             </div>
         )
@@ -101,13 +107,41 @@ class LoginBox extends React.Component {
 }
 
 export class Container extends React.Component {
+    constructor(props) {
+        super(props)
+        this.setLoggedIn = this.setLoggedIn.bind(this);
+        this.state = {
+            loggedIn: false
+        }
+    }
+
+    // We need to pass self in, as this is accessed within a callback function.
+    // This is a bit weird!
+    setLoggedIn() {
+        this.setState({
+            loggedIn: true
+        })
+    }
+
     render() {
-        var loggedIn = false;
-        return(
+        var cookies = document.cookie;
+
+        var userNotLoggedIn =
             <div className="container h-100">
-                <LoginBox/>
+                <LoginBox onlogin={this.setLoggedIn} />
             </div>
-        )
+        
+        var userLoggedIn = 
+            <div className="container h-100">
+                {cookies}
+            </div>
+
+        if (this.state.loggedIn) {
+            return(userLoggedIn);
+        } else {
+            return(userNotLoggedIn);
+        }
+
     }
 }
 
