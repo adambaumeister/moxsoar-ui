@@ -8,6 +8,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 // Add some defaults
 import './index.css';
 import * as serviceWorker from './serviceWorker';
+import './Custom.scss';
 
 ReactDOM.render(
   <React.StrictMode>

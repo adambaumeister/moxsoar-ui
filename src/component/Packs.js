@@ -1,6 +1,8 @@
 import React from 'react';
 import Moxsoar from '../api/moxsoar';
 import logo from '../moxsoar_logo.svg';
+import './Packs.css';
+
 
 class PackList extends React.Component {
     constructor(props) {
@@ -17,19 +19,20 @@ class PackList extends React.Component {
     }
 
     addPacks(result) {
+        var index = 0;
         for (var pack of result.json["Packs"]) {
-            console.log(pack.Name)
+            var p = this.state.packs;
+            
+            p.push(<Pack key={index} pack={pack}/>);
+            this.setState({packs: p});
+            index++; 
         }
     }
 
     render() {
         return (
             <div className="mt-3 ml-5 mr-5">
-                <Pack/>
-                <Pack/>
-                <Pack/>
-                <Pack/>
-
+                {this.state.packs}
             </div>
         )
     }
@@ -37,12 +40,20 @@ class PackList extends React.Component {
 
 class Pack extends React.Component {
     render() {
+        var Comment = "MOXSOAR content repository."
+        if (this.props.pack.Comment != "") {
+            Comment = this.props.pack.Comment
+        }        
+
         return (
-            <div className="card mb-2">
-                <div className="card-body">
-                    er's a card
-                </div>
-            </div>
+            <button className="mb-2 btn btn-primary w-100 text-left">
+                <h4>
+                    {this.props.pack.Name}
+                </h4>
+                <h6 className="text-muted">
+                    {Comment}
+                </h6>
+            </button>
         )
     }
 }
