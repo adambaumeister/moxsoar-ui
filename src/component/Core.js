@@ -3,8 +3,7 @@ import './core.css';
 import logo from '../moxsoar_logo.svg';
 import Moxsoar from '../api/moxsoar';
 import GetCookie from '../funcs/cookies';
-import Main from './Packs';
-import Navigation from './Packs';
+import {Main, Navigation} from './Packs';
 
 
 class LoginButton extends React.Component {
@@ -114,15 +113,21 @@ export class Container extends React.Component {
     constructor(props) {
         super(props)
         this.setLoggedIn = this.setLoggedIn.bind(this);
+        this.setPage = this.setPage.bind(this);
+        this.setPackPage = this.setPackPage.bind(this);
+
+
         var cookie = GetCookie('token');
 
         if (cookie) {
             this.state = {
-                loggedIn: true
+                loggedIn: true,
+                page: "packs",
+                packName: ''
             }
         } else {
             this.state = {
-                loggedIn: false
+                loggedIn: false,
             }
         }
 
@@ -136,9 +141,17 @@ export class Container extends React.Component {
         })
     }
 
+    setPage(pageValue) {
+        this.setState({page: pageValue})
+    }
+
+    
+    setPackPage(pageValue, packName) {
+        this.setState({page: pageValue, packName: packName})
+    }
+
     render() {
 
-        var nav = new Navigation();
         var userNotLoggedIn =
             <div className="container h-100">
                 <LoginBox onlogin={this.setLoggedIn} />
@@ -147,9 +160,9 @@ export class Container extends React.Component {
         var userLoggedIn =
             <div className="container h-100">
                 <div className="h-100 row justify-content-center align-items-center">
-                    <div class="col">
-                        <BackButton nav={nav}/>
-                        <Main />
+                    <div className="col">
+                        <BackButton onclick={this.setPage}/>
+                        <Main page={this.state.page} setPage={this.setPackPage} packName={this.state.packName}/>
                     </div>
                 </div>
             </div>
@@ -166,11 +179,21 @@ export class Container extends React.Component {
 
 
 class BackButton extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.onclick = this.onclick.bind(this);
+    }
+
+    onclick() {
+        this.props.onclick("packs")
+    }
+
     render() {
         return (
-            <svg class="bi bi-arrow-left-short" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" d="M7.854 4.646a.5.5 0 010 .708L5.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clip-rule="evenodd" />
-                <path fill-rule="evenodd" d="M4.5 8a.5.5 0 01.5-.5h6.5a.5.5 0 010 1H5a.5.5 0 01-.5-.5z" clip-rule="evenodd" />
+            <svg onClick={this.onclick} className="bi bi-arrow-left-short" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fillRule="evenodd" d="M7.854 4.646a.5.5 0 010 .708L5.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clipRule="evenodd" />
+                <path fillRule="evenodd" d="M4.5 8a.5.5 0 01.5-.5h6.5a.5.5 0 010 1H5a.5.5 0 01-.5-.5z" clipRule="evenodd" />
             </svg>
         )
     }

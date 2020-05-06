@@ -30,8 +30,11 @@ class Integration extends React.Component {
 class Running extends React.Component {
     render() {
         var ints = [];
+        var index = 0;
+
         for (var integration of this.props.running) {
-            ints.push(<Integration integration={integration}/>)
+            ints.push(<Integration key={index} integration={integration}/>)
+            index++;
         }
         return(
             <div className="m-4">
@@ -117,7 +120,7 @@ class PackList extends React.Component {
         for (var pack of result.json["Packs"]) {
             var p = this.state.packs;
 
-            p.push(<Pack nav={this.props.nav} key={index} pack={pack} />);
+            p.push(<Pack setPage={this.props.setPage} key={index} pack={pack} />);
             this.setState({ packs: p });
             index++;
         }
@@ -144,7 +147,7 @@ class Pack extends React.Component {
     }
 
     onclick() {
-        this.props.nav.nav("pack")(this.props.pack.Name)
+        this.props.setPage("pack", this.props.pack.Name)
     }
 
     render() {
@@ -166,34 +169,21 @@ class Pack extends React.Component {
     }
 }
 
-export default class Main extends React.Component {
+export class Main extends React.Component {
     constructor(props) {
         super(props);
-        this.packDetails = this.packDetails.bind(this);
-
-        this.state = {
-            currentView: 'packs'
-        }
-
-        var nav = new Navigation();
-        nav.register('pack', this.packDetails)
-        this.nav = nav;
-    }
-
-    packDetails(packName) {
-        this.setState({ currentView: "pack", packName: packName })
     }
 
     render() {
-        if (this.state.currentView == 'pack') {
+        if (this.props.page == 'pack') {
             return (
                 <div className="row h-100 justify-content-center align-items-center">
 
                     <div className="card main-box">
 
                         <img src={logo} height='50px' className="mt-4"></img>
-                        <h1 className="header mt-2 text-center text-muted">{this.state.packName}</h1>
-                        <PackDetails packName={this.state.packName} />
+                        <h1 className="header mt-2 text-center text-muted">{this.props.packName}</h1>
+                        <PackDetails packName={this.props.packName} />
                     </div>
                 </div>
             )
@@ -204,7 +194,7 @@ export default class Main extends React.Component {
 
                         <img src={logo} height='50px' className="mt-4"></img>
                         <h1 className="header mt-2 text-center text-muted">Installed Content Packs</h1>
-                        <PackList nav={this.nav} />
+                        <PackList setPage={this.props.setPage} />
                     </div>
                 </div>
             )
