@@ -34,33 +34,60 @@ export default class Moxsoar {
                     obj.authcb(r);
                 }
             )
-        }
+    }
 
-        GetPacks(obj) {
-    
-            var r = new MoxsoarResponse();
-            fetch("/packs", {
-                method: 'get'
+    GetPacks(obj) {
+
+        var r = new MoxsoarResponse();
+        fetch("/packs", {
+            method: 'get'
+        })
+            .then(function (response) {
+                r.SetResponse(response);
+
+                return response.json()
             })
-                .then(function (response) {
-                    r.SetResponse(response);
-    
-                    return response.json()
-                })
-                .then(
-                    (result) => {
-                        r.SetJson(result);
-                        obj.addPacks(r);
-                    },
-                    // Note: it's important to handle errors here
-                    // instead of a catch() block so that we don't swallow
-                    // exceptions from actual bugs in components.
-                    (error) => {
-                        r.SetError(error);
-                        obj.addPacks(r);
-                    }
-                )
-            }    
+            .then(
+                (result) => {
+                    r.SetJson(result);
+                    obj.addPacks(r);
+                },
+                // Note: it's important to handle errors here
+                // instead of a catch() block so that we don't swallow
+                // exceptions from actual bugs in components.
+                (error) => {
+                    r.SetError(error);
+                    obj.addPacks(r);
+                }
+            )
+    }
+
+    GetPackDetails(obj, packName) {
+
+        var r = new MoxsoarResponse();
+        fetch("/packs/"+packName, {
+            method: 'get'
+        })
+            .then(function (response) {
+                r.SetResponse(response);
+
+                return response.json()
+            })
+            .then(
+                (result) => {
+                    r.SetJson(result);
+                    obj.setDetails(r);
+                },
+                // Note: it's important to handle errors here
+                // instead of a catch() block so that we don't swallow
+                // exceptions from actual bugs in components.
+                (error) => {
+                    r.SetError(error);
+                    obj.setDetails(r);
+                }
+            )
+    }
+
 }
 
 export class MoxsoarResponse {

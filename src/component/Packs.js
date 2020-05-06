@@ -4,6 +4,100 @@ import logo from '../moxsoar_logo.svg';
 import './Packs.css';
 
 
+class InfoBox extends React.Component {
+    render() {
+        return (
+            <div className="text-center text-muted">{this.props.Description || ""} {this.props.Author || ""} {this.props.Version || ""}</div>
+        )
+    }
+}
+
+class Integration extends React.Component {
+    render() {
+        return(
+            <button className="mb-2 btn btn-primary w-100 text-left">
+            <h4>
+                {this.props.integration.Name}
+            </h4>
+            <h6 className="text-muted">
+                {this.props.integration.Addr}
+            </h6>
+        </button>
+        )
+    }
+}
+
+class Running extends React.Component {
+    render() {
+        var ints = [];
+        for (var integration of this.props.running) {
+            ints.push(<Integration integration={integration}/>)
+        }
+        return(
+            <div className="m-4">
+                {ints}
+            </div>
+        )
+    }
+}
+
+class RunnerTable extends React.Component {
+    render() {
+        return (
+            <div className="row mb-4 mt-4 text-center text-primary">
+                <div className="col p-0"><h5>Address</h5> {this.props.runner.Address}</div>
+                <div className="col p-0"><h5>Port Start</h5>{this.props.runner.PortMin}</div>
+                <div className="col p-0"><h5>Port End</h5>{this.props.runner.PortMax}</div>
+            </div>            
+        )
+    }
+}
+
+class PackDetails extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            retrieved: false,
+            runner: {}
+        };
+        this.setDetails = this.setDetails.bind(this);
+
+    }
+
+    componentDidMount() {
+
+        var m = new Moxsoar();
+        m.GetPackDetails(this, this.props.packName);
+    }
+
+    setDetails(result) {
+        this.setState({
+            runner: result.json["RunConfig"],
+            retrieved: true
+        })
+    }
+
+    render() {
+        if (!this.state.retrieved) {
+            return (
+                <div>Loading...</div>
+            )
+        } else {
+            return (
+                <div>
+                    <InfoBox Description={this.state.runner.Info.Description} Author={this.state.runner.Info.Author} Version={this.state.runner.Info.Version} />
+                    <h4 className="text-muted ml-4">Runner configuration</h4>
+                    <RunnerTable runner={this.state.runner.Runner} />
+                    <h4 className="text-muted ml-4">Running integrations</h4>
+                    <Running running={this.state.runner.Running}/>
+                </div>
+            )
+        }
+
+    }
+}
+
 class PackList extends React.Component {
     constructor(props) {
         super(props);
@@ -22,10 +116,10 @@ class PackList extends React.Component {
         var index = 0;
         for (var pack of result.json["Packs"]) {
             var p = this.state.packs;
-            
-            p.push(<Pack nav={this.props.nav} key={index} pack={pack}/>);
-            this.setState({packs: p});
-            index++; 
+
+            p.push(<Pack nav={this.props.nav} key={index} pack={pack} />);
+            this.setState({ packs: p });
+            index++;
         }
     }
 
@@ -57,7 +151,7 @@ class Pack extends React.Component {
         var Comment = "MOXSOAR content repository."
         if (this.props.pack.Comment != "") {
             Comment = this.props.pack.Comment
-        }        
+        }
 
         return (
             <button onClick={this.onclick} className="mb-2 btn btn-primary w-100 text-left">
@@ -87,28 +181,30 @@ export default class Main extends React.Component {
     }
 
     packDetails(packName) {
-        this.setState({currentView: "pack", packName: packName})
+        this.setState({ currentView: "pack", packName: packName })
     }
 
     render() {
         if (this.state.currentView == 'pack') {
             return (
                 <div className="row h-100 justify-content-center align-items-center">
+
                     <div className="card main-box">
-    
+
                         <img src={logo} height='50px' className="mt-4"></img>
                         <h1 className="header mt-2 text-center text-muted">{this.state.packName}</h1>
+                        <PackDetails packName={this.state.packName} />
                     </div>
                 </div>
             )
         } else {
             return (
-                <div className="row h-100 justify-content-center align-items-center">
+                <div className="">
                     <div className="card main-box">
-    
+
                         <img src={logo} height='50px' className="mt-4"></img>
                         <h1 className="header mt-2 text-center text-muted">Installed Content Packs</h1>
-                        <PackList nav={this.nav}/>
+                        <PackList nav={this.nav} />
                     </div>
                 </div>
             )
@@ -117,15 +213,24 @@ export default class Main extends React.Component {
     }
 }
 
-class Navigation {
+
+export class Navigation {
     constructor() {
         this.handlers = {};
+        this.lastview = "packs";
+        this.currentView = "packs";
     }
     register(viewName, f) {
         this.handlers[viewName] = f;
     }
 
     nav(viewName) {
+        this.lastview = this.currentView;
+        this.currentView = viewName;
         return this.handlers[viewName];
+    }
+
+    back() {
+        this.nav(this.lastview);
     }
 }
