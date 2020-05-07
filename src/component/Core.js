@@ -3,7 +3,7 @@ import './core.css';
 import logo from '../moxsoar_logo.svg';
 import Moxsoar from '../api/moxsoar';
 import GetCookie from '../funcs/cookies';
-import {Main, Navigation} from './Packs';
+import {Main} from './Packs';
 
 
 class LoginButton extends React.Component {
@@ -115,6 +115,7 @@ export class Container extends React.Component {
         this.setLoggedIn = this.setLoggedIn.bind(this);
         this.setPage = this.setPage.bind(this);
         this.setPackPage = this.setPackPage.bind(this);
+        this.setRoutePage = this.setRoutePage.bind(this);
 
 
         var cookie = GetCookie('token');
@@ -145,6 +146,10 @@ export class Container extends React.Component {
         this.setState({page: pageValue})
     }
 
+    setRoutePage(pageValue, packName) {
+        console.log("here");
+        this.setState({page: pageValue, packName: packName});
+    }
     
     setPackPage(pageValue, packName) {
         this.setState({page: pageValue, packName: packName})
@@ -162,7 +167,7 @@ export class Container extends React.Component {
                 <div className="h-100 row justify-content-center align-items-center">
                     <div className="col">
                         <BackButton onclick={this.setPage}/>
-                        <Main page={this.state.page} setPage={this.setPackPage} packName={this.state.packName}/>
+                        <Main page={this.state.page} setPage={this.setPackPage} setRoutePage={this.setRoutePage} packName={this.state.packName}/>
                     </div>
                 </div>
             </div>
@@ -191,7 +196,7 @@ class BackButton extends React.Component {
 
     render() {
         return (
-            <svg onClick={this.onclick} className="bi bi-arrow-left-short" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <svg onClick={this.onclick} className="bi bi-arrow-left-short" width="2.0em" height="2.0em" viewBox="0 0 16 16" fill="white" xmlns="http://www.w3.org/2000/svg">
                 <path fillRule="evenodd" d="M7.854 4.646a.5.5 0 010 .708L5.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clipRule="evenodd" />
                 <path fillRule="evenodd" d="M4.5 8a.5.5 0 01.5-.5h6.5a.5.5 0 010 1H5a.5.5 0 01-.5-.5z" clipRule="evenodd" />
             </svg>
@@ -210,3 +215,10 @@ export default class Background extends React.Component {
 }
 
 
+class Navigation {
+    constructor() {
+        this.setRoutePage = func(); 
+        this.setPackPage = func();
+        this.setPage = func(); 
+    }
+}

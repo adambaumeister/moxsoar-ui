@@ -13,9 +13,17 @@ class InfoBox extends React.Component {
 }
 
 class Integration extends React.Component {
+    constructor(props) {
+        super(props);
+        this.onclick = this.onclick.bind(this);
+    }
+
+    onclick() {
+        this.props.setRoutePage(this.props.integration.Name, "blah");
+    }
     render() {
         return(
-            <button className="mb-2 btn btn-primary w-100 text-left">
+            <button onClick={this.onclick} className="mb-2 btn btn-primary w-100 text-left">
             <h4>
                 {this.props.integration.Name}
             </h4>
@@ -29,11 +37,12 @@ class Integration extends React.Component {
 
 class Running extends React.Component {
     render() {
+
         var ints = [];
         var index = 0;
 
         for (var integration of this.props.running) {
-            ints.push(<Integration key={index} integration={integration}/>)
+            ints.push(<Integration key={index} integration={integration} setRoutePage={this.props.setRoutePage}/>)
             index++;
         }
         return(
@@ -93,7 +102,7 @@ class PackDetails extends React.Component {
                     <h4 className="text-muted ml-4">Runner configuration</h4>
                     <RunnerTable runner={this.state.runner.Runner} />
                     <h4 className="text-muted ml-4">Running integrations</h4>
-                    <Running running={this.state.runner.Running}/>
+                    <Running running={this.state.runner.Running} setRoutePage={this.props.setRoutePage}/>
                 </div>
             )
         }
@@ -183,7 +192,7 @@ export class Main extends React.Component {
 
                         <img src={logo} height='50px' className="mt-4"></img>
                         <h1 className="header mt-2 text-center text-muted">{this.props.packName}</h1>
-                        <PackDetails packName={this.props.packName} />
+                        <PackDetails packName={this.props.packName} setRoutePage={this.props.setRoutePage}/>
                     </div>
                 </div>
             )
@@ -200,27 +209,5 @@ export class Main extends React.Component {
             )
         }
 
-    }
-}
-
-
-export class Navigation {
-    constructor() {
-        this.handlers = {};
-        this.lastview = "packs";
-        this.currentView = "packs";
-    }
-    register(viewName, f) {
-        this.handlers[viewName] = f;
-    }
-
-    nav(viewName) {
-        this.lastview = this.currentView;
-        this.currentView = viewName;
-        return this.handlers[viewName];
-    }
-
-    back() {
-        this.nav(this.lastview);
     }
 }
