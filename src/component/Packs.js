@@ -19,7 +19,7 @@ class Integration extends React.Component {
     }
 
     onclick() {
-        this.props.setRoutePage(this.props.integration.Name, "blah");
+        this.props.nav.setRoutePage(this.props.integration.Name, "blah");
     }
     render() {
         return(
@@ -42,7 +42,7 @@ class Running extends React.Component {
         var index = 0;
 
         for (var integration of this.props.running) {
-            ints.push(<Integration key={index} integration={integration} setRoutePage={this.props.setRoutePage}/>)
+            ints.push(<Integration key={index} integration={integration} nav={this.props.nav}/>)
             index++;
         }
         return(
@@ -102,7 +102,7 @@ class PackDetails extends React.Component {
                     <h4 className="text-muted ml-4">Runner configuration</h4>
                     <RunnerTable runner={this.state.runner.Runner} />
                     <h4 className="text-muted ml-4">Running integrations</h4>
-                    <Running running={this.state.runner.Running} setRoutePage={this.props.setRoutePage}/>
+                    <Running running={this.state.runner.Running} nav={this.props.nav}/>
                 </div>
             )
         }
@@ -129,7 +129,7 @@ class PackList extends React.Component {
         for (var pack of result.json["Packs"]) {
             var p = this.state.packs;
 
-            p.push(<Pack setPage={this.props.setPage} key={index} pack={pack} />);
+            p.push(<Pack nav={this.props.nav} key={index} pack={pack} />);
             this.setState({ packs: p });
             index++;
         }
@@ -156,7 +156,7 @@ class Pack extends React.Component {
     }
 
     onclick() {
-        this.props.setPage("pack", this.props.pack.Name)
+        this.props.nav.setPage("pack", this.props.pack.Name)
     }
 
     render() {
@@ -192,7 +192,7 @@ export class Main extends React.Component {
 
                         <img src={logo} height='50px' className="mt-4"></img>
                         <h1 className="header mt-2 text-center text-muted">{this.props.packName}</h1>
-                        <PackDetails packName={this.props.packName} setRoutePage={this.props.setRoutePage}/>
+                        <PackDetails packName={this.props.packName} nav={this.props.nav}/>
                     </div>
                 </div>
             )
@@ -203,7 +203,7 @@ export class Main extends React.Component {
 
                         <img src={logo} height='50px' className="mt-4"></img>
                         <h1 className="header mt-2 text-center text-muted">Installed Content Packs</h1>
-                        <PackList setPage={this.props.setPage} />
+                        <PackList nav={this.props.nav} />
                     </div>
                 </div>
             )

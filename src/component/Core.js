@@ -117,8 +117,15 @@ export class Container extends React.Component {
         this.setPackPage = this.setPackPage.bind(this);
         this.setRoutePage = this.setRoutePage.bind(this);
 
-
         var cookie = GetCookie('token');
+
+        var navigation = new Navigation();
+        navigation.setRoutePage = this.setRoutePage;
+        navigation.setPackPage = this.setPackPage;
+        navigation.setPage = this.setPage;
+
+
+        this.nav = navigation;
 
         if (cookie) {
             this.state = {
@@ -147,7 +154,6 @@ export class Container extends React.Component {
     }
 
     setRoutePage(pageValue, packName) {
-        console.log("here");
         this.setState({page: pageValue, packName: packName});
     }
     
@@ -167,7 +173,7 @@ export class Container extends React.Component {
                 <div className="h-100 row justify-content-center align-items-center">
                     <div className="col">
                         <BackButton onclick={this.setPage}/>
-                        <Main page={this.state.page} setPage={this.setPackPage} setRoutePage={this.setRoutePage} packName={this.state.packName}/>
+                        <Main page={this.state.page} nav={this.nav} packName={this.state.packName}/>
                     </div>
                 </div>
             </div>
@@ -217,8 +223,8 @@ export default class Background extends React.Component {
 
 class Navigation {
     constructor() {
-        this.setRoutePage = func(); 
-        this.setPackPage = func();
-        this.setPage = func(); 
+        this.setRoutePage = '';
+        this.setPackPage = '';
+        this.setPage = '';  
     }
 }
