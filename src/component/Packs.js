@@ -19,7 +19,7 @@ class Integration extends React.Component {
     }
 
     onclick() {
-        this.props.nav.setRoutePage(this.props.integration.Name, "blah");
+        this.props.nav.setRoutePage(this.props.packName, this.props.integration.Name);
     }
     render() {
         return(
@@ -42,7 +42,7 @@ class Running extends React.Component {
         var index = 0;
 
         for (var integration of this.props.running) {
-            ints.push(<Integration key={index} integration={integration} nav={this.props.nav}/>)
+            ints.push(<Integration packName={this.props.packName} key={index} integration={integration} nav={this.props.nav}/>)
             index++;
         }
         return(
@@ -102,7 +102,7 @@ class PackDetails extends React.Component {
                     <h4 className="text-muted ml-4">Runner configuration</h4>
                     <RunnerTable runner={this.state.runner.Runner} />
                     <h4 className="text-muted ml-4">Running integrations</h4>
-                    <Running running={this.state.runner.Running} nav={this.props.nav}/>
+                    <Running packName={this.props.packName} running={this.state.runner.Running} nav={this.props.nav} />
                 </div>
             )
         }
@@ -156,7 +156,7 @@ class Pack extends React.Component {
     }
 
     onclick() {
-        this.props.nav.setPage("pack", this.props.pack.Name)
+        this.props.nav.setPackPage("pack", this.props.pack.Name)
     }
 
     render() {
@@ -184,6 +184,7 @@ export class Main extends React.Component {
     }
 
     render() {
+        //console.log(this.props.packName);
         if (this.props.page == 'pack') {
             return (
                 <div className="row h-100 justify-content-center align-items-center">
@@ -195,6 +196,17 @@ export class Main extends React.Component {
                         <PackDetails packName={this.props.packName} nav={this.props.nav}/>
                     </div>
                 </div>
+            )
+        } else if(this.props.page == 'integration') {
+            return (
+                <div className="row h-100 justify-content-center align-items-center">
+
+                <div className="card main-box">
+    
+                    <img src={logo} height='50px' className="mt-4"></img>
+                    <h1 className="header mt-2 text-center text-muted">{this.props.packName}</h1>
+                </div>
+            </div>
             )
         } else {
             return (

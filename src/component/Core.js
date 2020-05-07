@@ -131,7 +131,6 @@ export class Container extends React.Component {
             this.state = {
                 loggedIn: true,
                 page: "packs",
-                packName: ''
             }
         } else {
             this.state = {
@@ -153,8 +152,14 @@ export class Container extends React.Component {
         this.setState({page: pageValue})
     }
 
-    setRoutePage(pageValue, packName) {
-        this.setState({page: pageValue, packName: packName});
+    setRoutePage(packName, integrationName) {
+        console.log(packName);
+        this.setState({
+            page: "integration", 
+            packName: packName, 
+            integrationName: integrationName
+        });
+        console.log(this.state.packName)
     }
     
     setPackPage(pageValue, packName) {
