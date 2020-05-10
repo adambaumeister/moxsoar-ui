@@ -159,7 +159,6 @@ export class Container extends React.Component {
             packName: packName, 
             integrationName: integrationName
         });
-        console.log(this.state.packName)
     }
     
     setPackPage(pageValue, packName) {
@@ -178,7 +177,7 @@ export class Container extends React.Component {
                 <div className="h-100 row justify-content-center align-items-center">
                     <div className="col">
                         <BackButton onclick={this.setPage}/>
-                        <Main page={this.state.page} nav={this.nav} packName={this.state.packName}/>
+                        <Main page={this.state.page} nav={this.nav} packName={this.state.packName} integrationName={this.state.integrationName}/>
                     </div>
                 </div>
             </div>

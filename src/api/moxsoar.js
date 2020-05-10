@@ -87,6 +87,57 @@ export default class Moxsoar {
                 }
             )
     }
+    GetIntegrationDetails(obj, packName, integrationName) {
+
+        var r = new MoxsoarResponse();
+        fetch("/packs/"+packName +"/"+integrationName, {
+            method: 'get'
+        })
+            .then(function (response) {
+                r.SetResponse(response);
+
+                return response.json()
+            })
+            .then(
+                (result) => {
+                    r.SetJson(result);
+                    obj.setDetails(r);
+                },
+                // Note: it's important to handle errors here
+                // instead of a catch() block so that we don't swallow
+                // exceptions from actual bugs in components.
+                (error) => {
+                    r.SetError(error);
+                    obj.setDetails(r);
+                }
+            )
+    }
+
+    GetRouteDetails(obj, packName, integrationName, routeIndex) {
+
+        var r = new MoxsoarResponse();
+        fetch("/packs/"+packName +"/"+integrationName +"/"+routeIndex, {
+            method: 'get'
+        })
+            .then(function (response) {
+                r.SetResponse(response);
+
+                return response.json()
+            })
+            .then(
+                (result) => {
+                    r.SetJson(result);
+                    obj.setDetails(r);
+                },
+                // Note: it's important to handle errors here
+                // instead of a catch() block so that we don't swallow
+                // exceptions from actual bugs in components.
+                (error) => {
+                    r.SetError(error);
+                    obj.setDetails(r);
+                }
+            )
+    }
 
 }
 

@@ -2,7 +2,7 @@ import React from 'react';
 import Moxsoar from '../api/moxsoar';
 import logo from '../moxsoar_logo.svg';
 import './Packs.css';
-
+import IntegrationDetails from './Integration';
 
 class InfoBox extends React.Component {
     render() {
@@ -205,6 +205,7 @@ export class Main extends React.Component {
     
                     <img src={logo} height='50px' className="mt-4"></img>
                     <h1 className="header mt-2 text-center text-muted">{this.props.packName}</h1>
+                    <IntegrationDetails packName={this.props.packName} integrationName={this.props.integrationName}/>
                 </div>
             </div>
             )
