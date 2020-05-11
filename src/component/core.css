@@ -22,3 +22,9 @@
 .text-muted {
     color: #5d5d5d;
 }
+
+.json-cover {
+    background-color: rgb(28, 32, 35);
+    border: 1px solid rgb(28, 32, 35);
+    border-radius: 20px !important;
+}   

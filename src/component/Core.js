@@ -217,7 +217,8 @@ class BackButton extends React.Component {
 export default class Background extends React.Component {
     render() {
         var result;
-        result = <div className="bg">
+        result = <div className="h-100">
+            <div  className="bg"/>
             <Container />
         </div>
         return (result);

@@ -1,26 +1,73 @@
 import React from 'react';
 import Moxsoar from '../api/moxsoar';
+import ReactJson from 'react-json-view';
+import XMLViewer from 'react-xml-viewer'
 
-class Method extends React.Component {
-    
+import './core.css';
+
+function getFileType(fileName) {
+    var res = fileName.split(".");
+    return res[1];
 }
 
-class Methods extends React.Component {
+class Method extends React.Component {
     render() {
-        return (
-            <div className="card mt-2 mb-2 p-3">
+        var res = getFileType(this.props.method.ResponseFile);
+
+        var output;
+        if (res == "json") {
+            var j = JSON.parse(this.props.method.ResponseString);
+
+            output =  <div className="col json-cover mw-100 p-3 m-3">
+                        <ReactJson src={j} theme="ashes"/>
+                     </div>
+        } else if (res == "xml") {
+            output = <div className="colmw-100 p-3 m-3">
+                 <XMLViewer xml={this.props.method.ResponseString} />
+            </div>
+        } else {
+            output = <div className="colmw-100 p-3 m-3">
+                {this.props.method.ResponseString}
+            </div>
+        }
+        return(
+            <div>
                 <div className="row">
                     <div className="col">
                         <h5>
-                            {this.props.route.Route.Path}
+                            {this.props.method.HttpMethod} 
                         </h5>
                     </div>
                     <div className="col text-right">
                         <h5>
-                            {this.props.route.Route.ResponseCode}
+                            {this.props.method.ResponseCode} 
                         </h5>
                     </div>
+
                 </div>
+                <div className="row">
+                    {output}
+                </div>
+            </div>
+        )
+    }
+}
+
+class Methods extends React.Component {
+    render() {
+        var methods = [];
+
+        var index = 0;
+        for (var m of this.props.route.Route.Methods) {
+            var method = <Method key={index} method={m}/>
+            methods.push(method);
+            index++;  
+        }
+
+        return (
+            <div className="card mt-2 mb-2 p-3">
+                <h4 className="text-muted">Methods</h4>
+                {methods}
             </div>
         )
 

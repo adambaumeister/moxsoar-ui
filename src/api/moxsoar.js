@@ -163,6 +163,10 @@ export class MoxsoarResponse {
 
     SetError(error) {
         this.failed = true;
-        this.error = error;
+        if (typeof error != "string") {
+            this.error = "Failed to connect to the MOXSOAR API server."
+        } else {
+            this.error = error; 
+        }
     }
 }
