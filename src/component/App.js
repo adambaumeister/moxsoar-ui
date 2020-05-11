@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import Background from './Core'
+import { Background } from './Core'
 
 function App() {
   return (

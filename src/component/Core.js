@@ -16,7 +16,7 @@ class LoginButton extends React.Component {
     }
 }
 
-class TextInput extends React.Component {
+export class TextInput extends React.Component {
     constructor(props) {
         super(props);
     }
@@ -25,15 +25,15 @@ class TextInput extends React.Component {
         return (
             <div className="input-group mb-3">
                 <div className="input-group-prepend">
-                    <span className="input-group-text">{this.props.fieldName}</span>
+                    <span className="input-group-text">{this.props.displayName || this.props.fieldName}</span>
                 </div>
-                <input type={this.props.type || "text"} className="form-control" aria-label={this.props.fieldName} name={this.props.fieldName} aria-describedby="basic-addon1" />
+                <input type={this.props.type || "text"} className="form-control" aria-label={this.props.displayName || this.props.fieldName} name={this.props.fieldName} aria-describedby="basic-addon1" />
             </div>
         )
     }
 }
 
-class StatusBar extends React.Component {
+export class StatusBar extends React.Component {
     constructor(props) {
         super(props);
     }
@@ -214,7 +214,7 @@ class BackButton extends React.Component {
     }
 }
 
-export default class Background extends React.Component {
+export class Background extends React.Component {
     render() {
         var result;
         result = <div className="h-100">

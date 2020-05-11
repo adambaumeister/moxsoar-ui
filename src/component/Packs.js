@@ -3,6 +3,8 @@ import Moxsoar from '../api/moxsoar';
 import logo from '../moxsoar_logo.svg';
 import './Packs.css';
 import IntegrationDetails from './Integration';
+import { Plus } from 'react-bootstrap-icons';
+import { TextInput, StatusBar } from './Core'
 
 class InfoBox extends React.Component {
     render() {
@@ -22,15 +24,15 @@ class Integration extends React.Component {
         this.props.nav.setRoutePage(this.props.packName, this.props.integration.Name);
     }
     render() {
-        return(
+        return (
             <button onClick={this.onclick} className="mb-2 btn btn-primary w-100 text-left">
-            <h4>
-                {this.props.integration.Name}
-            </h4>
-            <h6 className="text-muted">
-                {this.props.integration.Addr}
-            </h6>
-        </button>
+                <h4>
+                    {this.props.integration.Name}
+                </h4>
+                <h6 className="text-muted">
+                    {this.props.integration.Addr}
+                </h6>
+            </button>
         )
     }
 }
@@ -42,10 +44,10 @@ class Running extends React.Component {
         var index = 0;
 
         for (var integration of this.props.running) {
-            ints.push(<Integration packName={this.props.packName} key={index} integration={integration} nav={this.props.nav}/>)
+            ints.push(<Integration packName={this.props.packName} key={index} integration={integration} nav={this.props.nav} />)
             index++;
         }
-        return(
+        return (
             <div className="m-4">
                 {ints}
             </div>
@@ -60,7 +62,7 @@ class RunnerTable extends React.Component {
                 <div className="col p-0"><h5>Address</h5> {this.props.runner.Address}</div>
                 <div className="col p-0"><h5>Port Start</h5>{this.props.runner.PortMin}</div>
                 <div className="col p-0"><h5>Port End</h5>{this.props.runner.PortMax}</div>
-            </div>            
+            </div>
         )
     }
 }
@@ -110,13 +112,91 @@ class PackDetails extends React.Component {
     }
 }
 
+class NewButton extends React.Component {
+
+    constructor(props) {
+        super(props);
+
+        this.submit = this.submit.bind(this);
+        this.clicked = this.clicked.bind(this);
+        this.setResult = this.setResult.bind(this);
+
+        this.b = <button onClick={this.clicked} className="mb-2 btn btn-secondary w-100 text-center text-primary text-dark">
+            <Plus size={48} />
+        </button>
+
+        this.state = {
+            display: this.b,
+            failed: false,
+            success: false
+        }
+
+    }
+
+    setResult(result) {
+        if (result.failed) {
+            this.setState({ failed: true, failMessage: result.error });
+        } else {
+            this.setState({
+                success: true,
+                message: result.json['Message'],
+                display: this.b
+            })
+            this.props.update();
+        }
+    }
+
+    submit(e) {
+        e.preventDefault();
+        var data = new FormData(e.target);
+        var m = new Moxsoar();
+        m.ClonePack(this, data.get("packname"), data.get("repo"))
+    }
+
+    clicked() {
+        var r = <form onSubmit={this.submit}>
+            <div className="row">
+                <div className="col">
+                    <TextInput displayName='Pack name' fieldName='packname' />
+                </div>
+                <div className="col">
+                    <TextInput displayName='Git repository' fieldName='repo' />
+                </div>
+            </div>
+            <div className="row mb-2">
+                <div className="col text-center">
+                    <button type="submit" className="btn btn-secondary text-light ">
+                        Add
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        this.setState({
+            display: r
+        })
+    }
+
+    render() {
+        return (
+            <div>
+                {this.state.display}
+                <StatusBar show={this.state.failed} type="alert alert-danger mt-4 fade show" msg={this.state.failMessage} />
+                <StatusBar show={this.state.success} type="alert alert-success mt-4 fade show" msg={this.state.message} />
+            </div>
+        )
+    }
+}
+
 class PackList extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            packs: []
+            packs: [],
+            added: false
         };
+        this.rerenderParentCallback = this.rerenderParentCallback.bind(this);
     }
 
     componentDidMount() {
@@ -124,10 +204,16 @@ class PackList extends React.Component {
         m.GetPacks(this);
     }
 
+    rerenderParentCallback() {
+        var m = new Moxsoar();
+        m.GetPacks(this);
+    }
+
     addPacks(result) {
         var index = 0;
+        var p = [];
+
         for (var pack of result.json["Packs"]) {
-            var p = this.state.packs;
 
             p.push(<Pack nav={this.props.nav} key={index} pack={pack} />);
             this.setState({ packs: p });
@@ -138,7 +224,10 @@ class PackList extends React.Component {
     render() {
         return (
             <div className="mt-3 ml-5 mr-5">
-                {this.state.packs}
+                <div>
+                    {this.state.packs}
+                </div>
+                <NewButton update={this.rerenderParentCallback} />
             </div>
         )
     }
@@ -193,21 +282,21 @@ export class Main extends React.Component {
 
                         <img src={logo} height='50px' className="mt-4"></img>
                         <h1 className="header mt-2 text-center text-muted">{this.props.packName}</h1>
-                        <PackDetails packName={this.props.packName} nav={this.props.nav}/>
+                        <PackDetails packName={this.props.packName} nav={this.props.nav} />
                     </div>
                 </div>
             )
-        } else if(this.props.page == 'integration') {
+        } else if (this.props.page == 'integration') {
             return (
                 <div className="row h-100 justify-content-center align-items-center">
 
-                <div className="card main-box">
-    
-                    <img src={logo} height='50px' className="mt-4"></img>
-                    <h1 className="header mt-2 text-center text-muted">{this.props.packName}</h1>
-                    <IntegrationDetails packName={this.props.packName} integrationName={this.props.integrationName}/>
+                    <div className="card main-box">
+
+                        <img src={logo} height='50px' className="mt-4"></img>
+                        <h1 className="header mt-2 text-center text-muted">{this.props.packName}</h1>
+                        <IntegrationDetails packName={this.props.packName} integrationName={this.props.integrationName} />
+                    </div>
                 </div>
-            </div>
             )
         } else {
             return (

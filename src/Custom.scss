@@ -1,6 +1,7 @@
 //$card-bg: #A6E1FA;
 
 $theme-colors: (
-    "primary": #d1dfe9
+    "primary": #d1dfe9,
+    "secondary": rgba(193, 193, 193, 0.34)
 );
 @import "node_modules/bootstrap/scss/bootstrap";
