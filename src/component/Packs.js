@@ -345,6 +345,18 @@ export class Main extends React.Component {
                     </div>
                 </div>
             )
+        } else if (this.props.page == 'settings') {
+            return(
+                <div className="row h-100 justify-content-center align-items-center">
+
+                <div className="card main-box">
+    
+                    <img src={logo} height='50px' className="mt-4"></img>
+                    <h1 className="header mt-2 text-center text-muted">Settings</h1>
+                </div>
+            </div>
+            )
+
         } else {
             return (
                 <div className="">

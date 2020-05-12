@@ -28,3 +28,11 @@
     border: 1px solid rgb(28, 32, 35);
     border-radius: 20px !important;
 }   
+
+.icon {
+    transition: all 0.1s ease-in;
+    cursor: pointer;
+}
+.icon:hover {
+    color: white;
+}

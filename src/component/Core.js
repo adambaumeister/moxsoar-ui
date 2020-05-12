@@ -4,6 +4,8 @@ import logo from '../moxsoar_logo.svg';
 import Moxsoar from '../api/moxsoar';
 import GetCookie from '../funcs/cookies';
 import {Main} from './Packs';
+import { ArrowLeft, Tools } from 'react-bootstrap-icons';
+
 
 
 class LoginButton extends React.Component {
@@ -176,7 +178,11 @@ export class Container extends React.Component {
             <div className="container h-100">
                 <div className="h-100 row justify-content-center align-items-center">
                     <div className="col">
-                        <BackButton onclick={this.setPage}/>
+                        <div className="m-2">
+                            <BackButton onclick={this.setPage}/>
+                            <SettingsButton onclick={this.setPage}/>
+                        </div>
+
                         <Main page={this.state.page} nav={this.nav} packName={this.state.packName} integrationName={this.state.integrationName}/>
                     </div>
                 </div>
@@ -192,6 +198,23 @@ export class Container extends React.Component {
     }
 }
 
+class SettingsButton extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.onclick = this.onclick.bind(this);
+    }
+
+    onclick() {
+        this.props.onclick("settings")
+    }
+
+    render() {
+        return (
+            <Tools onClick={this.onclick} size={24} className="icon"/>
+        )
+    }
+}
 
 class BackButton extends React.Component {
     constructor(props) {
@@ -206,10 +229,7 @@ class BackButton extends React.Component {
 
     render() {
         return (
-            <svg onClick={this.onclick} className="bi bi-arrow-left-short" width="2.0em" height="2.0em" viewBox="0 0 16 16" fill="white" xmlns="http://www.w3.org/2000/svg">
-                <path fillRule="evenodd" d="M7.854 4.646a.5.5 0 010 .708L5.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clipRule="evenodd" />
-                <path fillRule="evenodd" d="M4.5 8a.5.5 0 01.5-.5h6.5a.5.5 0 010 1H5a.5.5 0 01-.5-.5z" clipRule="evenodd" />
-            </svg>
+            <ArrowLeft onClick={this.onclick} size={24} className="icon"/>
         )
     }
 }
