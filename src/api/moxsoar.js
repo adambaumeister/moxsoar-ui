@@ -173,6 +173,40 @@ export default class Moxsoar {
             )
     }
 
+    
+    ActivatePack(obj, packName) {
+
+        var b = {
+            "packname": packName,
+        }
+        var r = new MoxsoarResponse();
+        fetch("/packs/activate", {
+            method: 'POST',
+            body: JSON.stringify(b)
+        })
+            .then(function (response) {
+                r.SetResponse(response);
+                if (!response.ok) {
+                    throw "Failed to clone the repository."
+                } else {
+                    return response.json()
+                }
+            })
+            .then(
+                (result) => {
+                    r.SetJson(result);
+                    obj.activatecb(r);
+                },
+                // Note: it's important to handle errors here
+                // instead of a catch() block so that we don't swallow
+                // exceptions from actual bugs in components.
+                (error) => {
+                    r.SetError(error);
+                    obj.activatecb(r);
+                }
+            )
+    }
+
 }
 
 export class MoxsoarResponse {

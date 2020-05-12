@@ -3,7 +3,7 @@ import Moxsoar from '../api/moxsoar';
 import logo from '../moxsoar_logo.svg';
 import './Packs.css';
 import IntegrationDetails from './Integration';
-import { Plus } from 'react-bootstrap-icons';
+import { Plus, Check } from 'react-bootstrap-icons';
 import { TextInput, StatusBar } from './Core'
 
 class InfoBox extends React.Component {
@@ -215,7 +215,7 @@ class PackList extends React.Component {
 
         for (var pack of result.json["Packs"]) {
 
-            p.push(<Pack nav={this.props.nav} key={index} pack={pack} />);
+            p.push(<Pack nav={this.props.nav} key={index} pack={pack} update={this.rerenderParentCallback}/>);
             this.setState({ packs: p });
             index++;
         }
@@ -233,6 +233,7 @@ class PackList extends React.Component {
     }
 }
 
+
 class Pack extends React.Component {
     constructor(props) {
         super(props);
@@ -241,28 +242,74 @@ class Pack extends React.Component {
             currentView: 'packs'
         }
 
+        this.state.Comment = "MOXSOAR content repository."
+        if (this.props.pack.Comment != "") {
+            this.state.Comment = this.props.pack.Comment
+        }
+
+        var c = <div className="col">
+            <h4>
+                {this.props.pack.Name}
+            </h4>
+            <h6 className="text-muted">
+                {this.state.Comment}
+            </h6>
+        </div>
+
+        this.c = c;
+
+        this.state.content = c;
+
         this.onclick = this.onclick.bind(this);
+        this.activate = this.activate.bind(this);
+
+    }
+
+    activate() {
+        var m = new Moxsoar();
+        m.ActivatePack(this, this.props.pack.Name);
+    }
+
+    activatecb(result) {
+        if (result.failed) {
+            this.setState({ failed: true, failMessage: result.error });
+        } else {
+            this.setState({content: this.c})
+
+
+            this.props.update();
+        }
     }
 
     onclick() {
-        this.props.nav.setPackPage("pack", this.props.pack.Name)
+
+        // If this is the active pack go to that page
+        if (this.props.pack.Active) {
+            this.props.nav.setPackPage("pack", this.props.pack.Name)
+            // Otherwise, set this one as active
+        } else {
+            var c = <div className="col">
+                <button onClick={this.activate} className="btn btn-dark p-2">Make this content pack active</button>
+            </div>
+            this.setState({content: c});
+        }
     }
 
     render() {
-        var Comment = "MOXSOAR content repository."
-        if (this.props.pack.Comment != "") {
-            Comment = this.props.pack.Comment
+        var flags = "";
+        if (this.props.pack.Active) {
+            var flags = <Check size={36} />
         }
 
         return (
-            <button onClick={this.onclick} className="mb-2 btn btn-primary w-100 text-left">
-                <h4>
-                    {this.props.pack.Name}
-                </h4>
-                <h6 className="text-muted">
-                    {Comment}
-                </h6>
-            </button>
+            <div onClick={this.onclick} className="mb-2 btn btn-primary w-100 text-left">
+                <div className="row">
+                    {this.state.content}
+                    <div className="col text-right my-auto checkbox">
+                        {flags}
+                    </div>
+                </div>
+            </div>
         )
     }
 }
