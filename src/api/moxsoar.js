@@ -207,6 +207,40 @@ export default class Moxsoar {
             )
     }
 
+    AddUser(obj, username, password) {
+
+        var b = {
+            "username": username,
+            "password": password,
+        }
+        var r = new MoxsoarResponse();
+        fetch("/adduser", {
+            method: 'POST',
+            body: JSON.stringify(b)
+        })
+            .then(function (response) {
+                r.SetResponse(response);
+                if (!response.ok) {
+                    throw "Failed to clone the repository."
+                } else {
+                    return response.json()
+                }
+            })
+            .then(
+                (result) => {
+                    r.SetJson(result);
+                    obj.addusercb(r);
+                },
+                // Note: it's important to handle errors here
+                // instead of a catch() block so that we don't swallow
+                // exceptions from actual bugs in components.
+                (error) => {
+                    r.SetError(error);
+                    obj.addusercb(r);
+                }
+            )
+    }
+
 }
 
 export class MoxsoarResponse {

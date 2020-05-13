@@ -4,7 +4,7 @@ import logo from '../moxsoar_logo.svg';
 import './Packs.css';
 import IntegrationDetails from './Integration';
 import { Plus, Check } from 'react-bootstrap-icons';
-import { TextInput, StatusBar } from './Core'
+import { GenericSubmitButton, TextInput, StatusBar } from './Core'
 
 class InfoBox extends React.Component {
     render() {
@@ -101,9 +101,9 @@ class PackDetails extends React.Component {
             return (
                 <div>
                     <InfoBox Description={this.state.runner.Info.Description} Author={this.state.runner.Info.Author} Version={this.state.runner.Info.Version} />
-                    <h4 className="text-muted ml-4">Runner configuration</h4>
+                    <h4 className="text-light ml-4">Runner configuration</h4>
                     <RunnerTable runner={this.state.runner.Runner} />
-                    <h4 className="text-muted ml-4">Running integrations</h4>
+                    <h4 className="text-light ml-4">Running integrations</h4>
                     <Running packName={this.props.packName} running={this.state.runner.Running} nav={this.props.nav} />
                 </div>
             )
@@ -215,7 +215,7 @@ class PackList extends React.Component {
 
         for (var pack of result.json["Packs"]) {
 
-            p.push(<Pack nav={this.props.nav} key={index} pack={pack} update={this.rerenderParentCallback}/>);
+            p.push(<Pack nav={this.props.nav} key={index} pack={pack} update={this.rerenderParentCallback} />);
             this.setState({ packs: p });
             index++;
         }
@@ -274,7 +274,7 @@ class Pack extends React.Component {
         if (result.failed) {
             this.setState({ failed: true, failMessage: result.error });
         } else {
-            this.setState({content: this.c})
+            this.setState({ content: this.c })
 
 
             this.props.update();
@@ -291,7 +291,7 @@ class Pack extends React.Component {
             var c = <div className="col">
                 <button onClick={this.activate} className="btn btn-dark p-2">Make this content pack active</button>
             </div>
-            this.setState({content: c});
+            this.setState({ content: c });
         }
     }
 
@@ -314,6 +314,77 @@ class Pack extends React.Component {
     }
 }
 
+
+
+class Settings extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            failed: false,
+            failMessage: '',
+            matching: false,
+            newPassword: '',
+            newPasswordRepeat: '',
+            inputclass: "",
+            message: "",
+            success: ""
+        }
+        this.onPwChange = this.onPwChange.bind(this);
+        this.onRepeatChange = this.onRepeatChange.bind(this);
+        this.reactStringify = this.reactStringify.bind(this);
+        this.addusercb = this.addusercb.bind(this);
+
+    }
+
+    onPwChange(pw) {
+        this.setState({ newPassword: pw });
+    }
+
+    onRepeatChange(pw) {
+        if (pw != this.state.newPassword) {
+            this.setState({ inputclass: "bg-warning" })
+        } else {
+            this.setState({ inputclass: "bg-success" })
+
+        }
+        this.setState({ newPasswordRepeat: pw });
+
+    }
+
+    reactStringify(e) {
+        e.preventDefault();
+        var data = new FormData(e.target);
+        var m = new Moxsoar();
+        console.log(this.props.username)
+        m.AddUser(this, this.props.username, data.get('password'));
+    }
+
+    addusercb(result) {
+        if (result.failed) {
+            this.setState({ failed: true, failMessage: result.error });
+        } else {
+            this.setState({ success: true, message: "Success! "});
+        }
+    }
+    render() {
+        return (
+            <div className="m-4">
+                <h4 className="text-light mb-2">
+                    Change password
+                </h4>
+                <form onSubmit={this.reactStringify}>
+                    <TextInput onchange={this.onPwChange} fieldName='password' type='password' />
+                    <TextInput onchange={this.onRepeatChange} inputclass={this.state.inputclass} displayName="Repeat Password" fieldName='RepeatPassword' type='password' />
+                    <GenericSubmitButton />
+                    <StatusBar show={this.state.failed} type="alert alert-danger mt-4 fade show" msg={this.state.failMessage} />
+                    <StatusBar show={this.state.success} type="alert alert-success mt-4 fade show" msg={this.state.message} />
+
+                </form>
+            </div>
+        )
+    }
+}
+
 export class Main extends React.Component {
     constructor(props) {
         super(props);
@@ -328,7 +399,7 @@ export class Main extends React.Component {
                     <div className="card main-box">
 
                         <img src={logo} height='50px' className="mt-4"></img>
-                        <h1 className="header mt-2 text-center text-muted">{this.props.packName}</h1>
+                        <h1 className="header mt-2 text-center text-light">{this.props.packName}</h1>
                         <PackDetails packName={this.props.packName} nav={this.props.nav} />
                     </div>
                 </div>
@@ -340,21 +411,22 @@ export class Main extends React.Component {
                     <div className="card main-box">
 
                         <img src={logo} height='50px' className="mt-4"></img>
-                        <h1 className="header mt-2 text-center text-muted">{this.props.packName}</h1>
+                        <h1 className="header mt-2 text-center text-light">{this.props.packName}</h1>
                         <IntegrationDetails packName={this.props.packName} integrationName={this.props.integrationName} />
                     </div>
                 </div>
             )
         } else if (this.props.page == 'settings') {
-            return(
+            return (
                 <div className="row h-100 justify-content-center align-items-center">
 
-                <div className="card main-box">
-    
-                    <img src={logo} height='50px' className="mt-4"></img>
-                    <h1 className="header mt-2 text-center text-muted">Settings</h1>
+                    <div className="card main-box">
+
+                        <img src={logo} height='50px' className="mt-4"></img>
+                        <h1 className="header mt-2 text-center text-light">Settings</h1>
+                        <Settings username={this.props.username} />
+                    </div>
                 </div>
-            </div>
             )
 
         } else {
@@ -363,7 +435,7 @@ export class Main extends React.Component {
                     <div className="card main-box">
 
                         <img src={logo} height='50px' className="mt-4"></img>
-                        <h1 className="header mt-2 text-center text-muted">Installed Content Packs</h1>
+                        <h1 className="header mt-2 text-center text-light">Installed Content Packs</h1>
                         <PackList nav={this.props.nav} />
                     </div>
                 </div>

@@ -21,15 +21,21 @@ class LoginButton extends React.Component {
 export class TextInput extends React.Component {
     constructor(props) {
         super(props);
+        this.onchange = this.onchange.bind(this);
     }
 
+    onchange(event) {
+        if (this.props.onchange) {
+            this.props.onchange(event.target.value);
+        }
+    }
     render() {
         return (
             <div className="input-group mb-3">
-                <div className="input-group-prepend">
-                    <span className="input-group-text">{this.props.displayName || this.props.fieldName}</span>
+                <div className="input-group-prepend w-25">
+                    <span className="input-group-text w-100">{this.props.displayName || this.props.fieldName}</span>
                 </div>
-                <input type={this.props.type || "text"} className="form-control" aria-label={this.props.displayName || this.props.fieldName} name={this.props.fieldName} aria-describedby="basic-addon1" />
+                <input onChange={this.onchange} type={this.props.type || "text"} className={"form-control " + this.props.inputclass} aria-label={this.props.displayName || this.props.fieldName} name={this.props.fieldName} aria-describedby="basic-addon1" />
             </div>
         )
     }
@@ -49,6 +55,16 @@ export class StatusBar extends React.Component {
         }
         return (
             <div className={this.props.type} style={style}>{this.props.msg}</div>
+        )
+    }
+}
+
+export class GenericSubmitButton extends React.Component {
+    render() {
+        return (
+            <button type="submit" className="btn btn-primary">
+                Submit
+            </button>
         )
     }
 }
@@ -197,7 +213,7 @@ export class Container extends React.Component {
                             <SettingsButton onclick={this.setPage}/>
                         </div>
 
-                        <Main page={this.state.page} nav={this.nav} packName={this.state.packName} integrationName={this.state.integrationName}/>
+                        <Main page={this.state.page} nav={this.nav} packName={this.state.packName} integrationName={this.state.integrationName} username={this.state.username}/>
                         <Footer username={this.state.username}/>
                     </div>
                 </div>
