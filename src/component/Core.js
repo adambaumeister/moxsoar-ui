@@ -79,7 +79,7 @@ class LoginForm extends React.Component {
         if (result.failed) {
             this.setState({ failed: true, failMessage: result.error });
         } else {
-            this.props.onlogin();
+            this.props.onlogin(result.json['Username']);
         }
     }
 
@@ -111,6 +111,18 @@ class LoginBox extends React.Component {
     }
 }
 
+class Footer extends React.Component {
+    render() {
+        return(
+            <div className="text-center text-light">
+                <small>
+                    Logged in as {this.props.username}
+                </small>
+            </div>
+        )
+    }
+}
+
 export class Container extends React.Component {
     constructor(props) {
         super(props)
@@ -120,12 +132,12 @@ export class Container extends React.Component {
         this.setRoutePage = this.setRoutePage.bind(this);
 
         var cookie = GetCookie('token');
+        var usernameCookie = GetCookie('username');
 
         var navigation = new Navigation();
         navigation.setRoutePage = this.setRoutePage;
         navigation.setPackPage = this.setPackPage;
         navigation.setPage = this.setPage;
-
 
         this.nav = navigation;
 
@@ -133,6 +145,7 @@ export class Container extends React.Component {
             this.state = {
                 loggedIn: true,
                 page: "packs",
+                username: usernameCookie
             }
         } else {
             this.state = {
@@ -144,9 +157,10 @@ export class Container extends React.Component {
 
     // We need to pass self in, as this is accessed within a callback function.
     // This is a bit weird!
-    setLoggedIn() {
+    setLoggedIn(username) {
         this.setState({
-            loggedIn: true
+            loggedIn: true,
+            username: username
         })
     }
 
@@ -184,6 +198,7 @@ export class Container extends React.Component {
                         </div>
 
                         <Main page={this.state.page} nav={this.nav} packName={this.state.packName} integrationName={this.state.integrationName}/>
+                        <Footer username={this.state.username}/>
                     </div>
                 </div>
             </div>
