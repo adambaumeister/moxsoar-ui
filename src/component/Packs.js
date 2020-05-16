@@ -3,7 +3,7 @@ import Moxsoar from '../api/moxsoar';
 import logo from '../moxsoar_logo.svg';
 import './Packs.css';
 import IntegrationDetails from './Integration';
-import { Plus, Check } from 'react-bootstrap-icons';
+import { Plus, Check, ArrowClockwise } from 'react-bootstrap-icons';
 import { GenericSubmitButton, TextInput, StatusBar } from './Core'
 
 class InfoBox extends React.Component {
@@ -261,6 +261,7 @@ class Pack extends React.Component {
         this.state.content = c;
 
         this.onclick = this.onclick.bind(this);
+        this.updateClick = this.updateClick.bind(this);
         this.activate = this.activate.bind(this);
 
     }
@@ -295,6 +296,10 @@ class Pack extends React.Component {
         }
     }
 
+    updateClick() {
+        console.log('Clicked')
+    }
+
     render() {
         var flags = "";
         if (this.props.pack.Active) {
@@ -302,14 +307,18 @@ class Pack extends React.Component {
         }
 
         return (
-            <div onClick={this.onclick} className="mb-2 btn btn-primary w-100 text-left">
-                <div className="row">
-                    {this.state.content}
-                    <div className="col text-right my-auto checkbox">
-                        {flags}
+            <div className="row no-gutters">
+                <div className="col-1 icon text-center my-auto no-gutters" onClick={this.updateClick}><ArrowClockwise size={36}/></div>
+                <div onClick={this.onclick} className="col mb-2 btn btn-primary w-100 text-left">
+                    <div className="row pl-2">
+                        {this.state.content}
+                        <div className="col-1 text-right my-auto checkbox">
+                            {flags}
+                        </div>
                     </div>
                 </div>
             </div>
+
         )
     }
 }
