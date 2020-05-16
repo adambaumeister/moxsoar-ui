@@ -1,9 +1,6 @@
 //import React from 'react';
 
 export default class Moxsoar {
-    constructor() {
-    }
-
     Auth(username, password, obj) {
 
         var b = {
@@ -237,6 +234,40 @@ export default class Moxsoar {
                 (error) => {
                     r.SetError(error);
                     obj.addusercb(r);
+                }
+            )
+    }
+
+    
+    UpdatePack(cb, packName) {
+
+        var b = {
+            "packname": packName
+        }
+        var r = new MoxsoarResponse();
+        fetch("/packs/update", {
+            method: 'POST',
+            body: JSON.stringify(b)
+        })
+            .then(function (response) {
+                r.SetResponse(response);
+                if (!response.ok) {
+                    throw "Failed to clone the repository."
+                } else {
+                    return response.json()
+                }
+            })
+            .then(
+                (result) => {
+                    r.SetJson(result);
+                    cb(r);
+                },
+                // Note: it's important to handle errors here
+                // instead of a catch() block so that we don't swallow
+                // exceptions from actual bugs in components.
+                (error) => {
+                    r.SetError(error);
+                    cb(r);
                 }
             )
     }

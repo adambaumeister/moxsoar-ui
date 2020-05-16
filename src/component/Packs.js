@@ -3,7 +3,7 @@ import Moxsoar from '../api/moxsoar';
 import logo from '../moxsoar_logo.svg';
 import './Packs.css';
 import IntegrationDetails from './Integration';
-import { Plus, Check, ArrowClockwise } from 'react-bootstrap-icons';
+import { Plus, Check, ArrowClockwise, X } from 'react-bootstrap-icons';
 import { GenericSubmitButton, TextInput, StatusBar } from './Core'
 
 class InfoBox extends React.Component {
@@ -261,7 +261,6 @@ class Pack extends React.Component {
         this.state.content = c;
 
         this.onclick = this.onclick.bind(this);
-        this.updateClick = this.updateClick.bind(this);
         this.activate = this.activate.bind(this);
 
     }
@@ -296,10 +295,6 @@ class Pack extends React.Component {
         }
     }
 
-    updateClick() {
-        console.log('Clicked')
-    }
-
     render() {
         var flags = "";
         if (this.props.pack.Active) {
@@ -308,7 +303,7 @@ class Pack extends React.Component {
 
         return (
             <div className="row no-gutters">
-                <div className="col-1 icon text-center my-auto no-gutters" onClick={this.updateClick}><ArrowClockwise size={36}/></div>
+                <UpdateButton pack={this.props.pack} />
                 <div onClick={this.onclick} className="col mb-2 btn btn-primary w-100 text-left">
                     <div className="row pl-2">
                         {this.state.content}
@@ -323,6 +318,56 @@ class Pack extends React.Component {
     }
 }
 
+class UpdateButton extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.updateClick = this.updateClick.bind(this);
+        this.updatecb = this.updatecb.bind(this);
+
+        this.state = {
+            success: false,
+            failed: false,
+            loading: false
+        }
+
+    }
+
+    updatecb(result) {
+        if (result.failed) {
+            this.setState({ failed: true, failMessage: result.error, loading: false });
+        } else {
+            this.setState({ success: true, loading: false});
+        }
+    }
+
+    updateClick() {
+        var m = new Moxsoar();
+        this.setState({ loading: true });
+
+        m.UpdatePack(this.updatecb, this.props.pack.Name)
+    }
+
+    render() {
+        var icon;
+        if (this.state.success) {
+            icon = <Check size={36} />
+        } else if (this.state.failed) {
+            icon = <X size={36} />
+        } else if (this.state.loading) {
+            icon = <div className="spinner-border" role="status">
+                <span className="sr-only">Loading...</span>
+            </div>
+        } else {
+            icon = <ArrowClockwise size={36} />
+        }
+
+        return (
+            <div className="col-1 icon text-center my-auto no-gutters" onClick={this.updateClick}>{icon}</div>
+        )
+    }
+
+}
 
 
 class Settings extends React.Component {
@@ -372,7 +417,7 @@ class Settings extends React.Component {
         if (result.failed) {
             this.setState({ failed: true, failMessage: result.error });
         } else {
-            this.setState({ success: true, message: "Success! "});
+            this.setState({ success: true, message: "Success! " });
         }
     }
     render() {

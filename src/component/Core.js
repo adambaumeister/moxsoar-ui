@@ -42,10 +42,6 @@ export class TextInput extends React.Component {
 }
 
 export class StatusBar extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         var style;
         if (this.props.show) {
