@@ -9,7 +9,7 @@ export default class Moxsoar {
         }
 
         var r = new MoxsoarResponse();
-        fetch("/auth", {
+        fetch("/api/auth", {
             method: 'post',
             body: JSON.stringify(b),
         })
@@ -36,7 +36,7 @@ export default class Moxsoar {
     GetPacks(obj) {
 
         var r = new MoxsoarResponse();
-        fetch("/packs", {
+        fetch("/api/packs", {
             method: 'get'
         })
             .then(function (response) {
@@ -62,7 +62,7 @@ export default class Moxsoar {
     GetPackDetails(obj, packName) {
 
         var r = new MoxsoarResponse();
-        fetch("/packs/"+packName, {
+        fetch("/api/packs/"+packName, {
             method: 'get'
         })
             .then(function (response) {
@@ -87,7 +87,7 @@ export default class Moxsoar {
     GetIntegrationDetails(obj, packName, integrationName) {
 
         var r = new MoxsoarResponse();
-        fetch("/packs/"+packName +"/"+integrationName, {
+        fetch("/api/packs/"+packName +"/"+integrationName, {
             method: 'get'
         })
             .then(function (response) {
@@ -113,7 +113,7 @@ export default class Moxsoar {
     GetRouteDetails(obj, packName, integrationName, routeIndex) {
 
         var r = new MoxsoarResponse();
-        fetch("/packs/"+packName +"/"+integrationName +"/"+routeIndex, {
+        fetch("/api/packs/"+packName +"/"+integrationName +"/"+routeIndex, {
             method: 'get'
         })
             .then(function (response) {
@@ -143,7 +143,7 @@ export default class Moxsoar {
             "repo": repo
         }
         var r = new MoxsoarResponse();
-        fetch("/packs/clone", {
+        fetch("/api/packs/clone", {
             method: 'POST',
             body: JSON.stringify(b)
         })
@@ -177,7 +177,7 @@ export default class Moxsoar {
             "packname": packName,
         }
         var r = new MoxsoarResponse();
-        fetch("/packs/activate", {
+        fetch("/api/packs/activate", {
             method: 'POST',
             body: JSON.stringify(b)
         })
@@ -211,7 +211,7 @@ export default class Moxsoar {
             "password": password,
         }
         var r = new MoxsoarResponse();
-        fetch("/adduser", {
+        fetch("/api/adduser", {
             method: 'POST',
             body: JSON.stringify(b)
         })
@@ -245,7 +245,7 @@ export default class Moxsoar {
             "packname": packName
         }
         var r = new MoxsoarResponse();
-        fetch("/packs/update", {
+        fetch("/api/packs/update", {
             method: 'POST',
             body: JSON.stringify(b)
         })
