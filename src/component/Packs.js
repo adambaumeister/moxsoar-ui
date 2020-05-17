@@ -3,7 +3,7 @@ import Moxsoar from '../api/moxsoar';
 import logo from '../moxsoar_logo.svg';
 import './Packs.css';
 import IntegrationDetails from './Integration';
-import { Plus, Check, ArrowClockwise, X } from 'react-bootstrap-icons';
+import { Plus, Check, ArrowClockwise, ArrowDown, X } from 'react-bootstrap-icons';
 import { GenericSubmitButton, TextInput, StatusBar } from './Core'
 
 class InfoBox extends React.Component {
@@ -359,7 +359,7 @@ class UpdateButton extends React.Component {
                 <span className="sr-only">Loading...</span>
             </div>
         } else {
-            icon = <ArrowClockwise size={36} />
+            icon = <ArrowDown size={36} />
         }
 
         return (
