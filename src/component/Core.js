@@ -4,7 +4,7 @@ import logo from '../moxsoar_logo.svg';
 import Moxsoar from '../api/moxsoar';
 import GetCookie from '../funcs/cookies';
 import {Main} from './Packs';
-import { ArrowLeft, Tools } from 'react-bootstrap-icons';
+import { ArrowLeft, Tools, QuestionCircle } from 'react-bootstrap-icons';
 
 
 
@@ -207,6 +207,7 @@ export class Container extends React.Component {
                         <div className="m-2">
                             <BackButton onclick={this.setPage}/>
                             <SettingsButton onclick={this.setPage}/>
+                            <HelpButton/>
                         </div>
 
                         <Main page={this.state.page} nav={this.nav} packName={this.state.packName} integrationName={this.state.integrationName} username={this.state.username}/>
@@ -242,6 +243,25 @@ class SettingsButton extends React.Component {
         )
     }
 }
+
+class HelpButton extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.onclick = this.onclick.bind(this);
+    }
+
+    onclick() {
+        window.open("https://adambaumeister.github.io/moxsoar/")
+    }
+
+    render() {
+        return (
+            <QuestionCircle onClick={this.onclick} size={24} className="icon"/>
+        )
+    }
+}
+
 
 class BackButton extends React.Component {
     constructor(props) {
