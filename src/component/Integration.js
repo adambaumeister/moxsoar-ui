@@ -1,7 +1,10 @@
 import React from 'react';
 import Moxsoar from '../api/moxsoar';
 import ReactJson from 'react-json-view';
-import XMLViewer from 'react-xml-viewer'
+import XMLViewer from 'react-xml-viewer';
+import { Plus } from 'react-bootstrap-icons';
+import { GenericSubmitButton, TextInput, StatusBar, SelectInput } from './Core'
+
 
 import './core.css';
 
@@ -18,29 +21,29 @@ class Method extends React.Component {
         if (res == "json") {
             var j = JSON.parse(this.props.method.ResponseString);
 
-            output =  <div className="col json-cover mw-100 p-3 m-3">
-                        <ReactJson src={j} theme="ashes"/>
-                     </div>
+            output = <div className="col json-cover mw-100 p-3 m-3">
+                <ReactJson src={j} theme="ashes" />
+            </div>
         } else if (res == "xml") {
             output = <div className="colmw-100 p-3 m-3">
-                 <XMLViewer xml={this.props.method.ResponseString} />
+                <XMLViewer xml={this.props.method.ResponseString} />
             </div>
         } else {
             output = <div className="colmw-100 p-3 m-3">
                 {this.props.method.ResponseString}
             </div>
         }
-        return(
+        return (
             <div>
                 <div className="row">
                     <div className="col">
                         <h5>
-                            {this.props.method.HttpMethod} 
+                            {this.props.method.HttpMethod}
                         </h5>
                     </div>
                     <div className="col text-right">
                         <h5>
-                            {this.props.method.ResponseCode} 
+                            {this.props.method.ResponseCode}
                         </h5>
                     </div>
 
@@ -59,9 +62,9 @@ class Methods extends React.Component {
 
         var index = 0;
         for (var m of this.props.route.Route.Methods) {
-            var method = <Method key={index} method={m}/>
+            var method = <Method key={index} method={m} />
             methods.push(method);
-            index++;  
+            index++;
         }
 
         return (
@@ -86,7 +89,7 @@ class Route extends React.Component {
 
     }
 
-    displayMethod() {        
+    displayMethod() {
         var mapi = new Moxsoar();
         if (this.state.methodDisplayed) {
             this.setState({
@@ -101,8 +104,8 @@ class Route extends React.Component {
     }
 
     setDetails(result) {
-        var j = result.json; 
-        var m = <Methods route={j}/>
+        var j = result.json;
+        var m = <Methods route={j} />
 
         this.setState({
             methodDisplay: m,
@@ -137,6 +140,52 @@ class Route extends React.Component {
     }
 }
 
+class AddRouteButton extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <button onClick={this.props.addCallback} className="mb-2 btn btn-secondary w-100 text-center text-primary text-dark">
+                <Plus size={48} />
+            </button>
+        )
+    }
+}
+
+class AddRouteForm extends React.Component {
+    render() {
+        var codes = [
+            200,
+            404,
+            500
+        ];
+
+        return (
+            <form onSubmit={this.submit}>
+                <div className="row">
+                    <div className="col">
+                        <TextInput displayName='Route Path' fieldName='path' />
+                    </div>
+                    <div className="col">
+                        <TextInput displayName='Filename' fieldName='filename' />
+                    </div>
+                    <div className="col-2">
+                        <SelectInput name="responsecode" options={codes}/>
+                    </div>
+                </div>
+                <div className="row mb-2">
+                    <div className="col text-center">
+                        <button type="submit" className="btn btn-secondary text-light ">
+                            Add
+                    </button>
+                    </div>
+                </div>
+            </form>
+        )
+    }
+}
 
 class Routes extends React.Component {
 
@@ -144,15 +193,29 @@ class Routes extends React.Component {
         super(props);
         this.routes = [];
         var index = 0;
+        this.state = ({
+            form: <div></div>
+        })
+
+        this.addRoute = this.addRoute.bind(this);
+
         for (var route of this.props.routes) {
-            this.routes.push(<Route rowId={index} key={index} route={route} packName={this.props.packName} integrationName={this.props.integrationName}/>);
+            this.routes.push(<Route rowId={index} key={index} route={route} packName={this.props.packName} integrationName={this.props.integrationName} />);
             index++;
         }
+
+    }
+
+    addRoute() {
+        console.log("here");
+        this.setState({ form: <AddRouteForm/> });
     }
 
     render() {
         return (
             <div className="m-4">
+                <AddRouteButton addCallback={this.addRoute} />
+                {this.state.form}
                 {this.routes}
             </div>
         )

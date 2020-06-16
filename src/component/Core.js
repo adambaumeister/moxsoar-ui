@@ -3,7 +3,7 @@ import './core.css';
 import logo from '../moxsoar_logo.svg';
 import Moxsoar from '../api/moxsoar';
 import GetCookie from '../funcs/cookies';
-import {Main} from './Packs';
+import { Main } from './Packs';
 import { ArrowLeft, Tools, QuestionCircle } from 'react-bootstrap-icons';
 
 
@@ -18,7 +18,38 @@ class LoginButton extends React.Component {
     }
 }
 
+export class SelectInput extends React.Component {
+    /*
+    generic SelectInput controller
+    Props
+        options (array) : List of items to display as selectable values
+        name (str)      : Name of select field.
+    */
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        const selectOptions = this.props.options.map((option) =>
+            <option value="{option}">{option}</option>
+        );
+        return (
+            <select name={this.props.name} className="form-control">
+                {selectOptions}
+            </select>
+        )
+    }
+}
+
 export class TextInput extends React.Component {
+    /*
+    generic TextInput controller
+    Props
+        type (str)              : Input type -> defaults to "text"
+        inputClass (str)        : Class to add in addition to bootstrap defaults
+        fieldname (str)         : Name of input field
+        displayName (str)       : Human readable name of input field
+    */
     constructor(props) {
         super(props);
         this.onchange = this.onchange.bind(this);
@@ -125,7 +156,7 @@ class LoginBox extends React.Component {
 
 class Footer extends React.Component {
     render() {
-        return(
+        return (
             <div className="text-center text-light">
                 <small>
                     Logged in as {this.props.username}
@@ -177,20 +208,20 @@ export class Container extends React.Component {
     }
 
     setPage(pageValue) {
-        this.setState({page: pageValue})
+        this.setState({ page: pageValue })
     }
 
     setRoutePage(packName, integrationName) {
         console.log(packName);
         this.setState({
-            page: "integration", 
-            packName: packName, 
+            page: "integration",
+            packName: packName,
             integrationName: integrationName
         });
     }
-    
+
     setPackPage(pageValue, packName) {
-        this.setState({page: pageValue, packName: packName})
+        this.setState({ page: pageValue, packName: packName })
     }
 
     render() {
@@ -205,13 +236,13 @@ export class Container extends React.Component {
                 <div className="h-100 row justify-content-center align-items-center">
                     <div className="col">
                         <div className="m-2">
-                            <BackButton onclick={this.setPage}/>
-                            <SettingsButton onclick={this.setPage}/>
-                            <HelpButton/>
+                            <BackButton onclick={this.setPage} />
+                            <SettingsButton onclick={this.setPage} />
+                            <HelpButton />
                         </div>
 
-                        <Main page={this.state.page} nav={this.nav} packName={this.state.packName} integrationName={this.state.integrationName} username={this.state.username}/>
-                        <Footer username={this.state.username}/>
+                        <Main page={this.state.page} nav={this.nav} packName={this.state.packName} integrationName={this.state.integrationName} username={this.state.username} />
+                        <Footer username={this.state.username} />
                     </div>
                 </div>
             </div>
@@ -239,7 +270,7 @@ class SettingsButton extends React.Component {
 
     render() {
         return (
-            <Tools onClick={this.onclick} size={24} className="icon"/>
+            <Tools onClick={this.onclick} size={24} className="icon" />
         )
     }
 }
@@ -257,7 +288,7 @@ class HelpButton extends React.Component {
 
     render() {
         return (
-            <QuestionCircle onClick={this.onclick} size={24} className="icon"/>
+            <QuestionCircle onClick={this.onclick} size={24} className="icon" />
         )
     }
 }
@@ -276,7 +307,7 @@ class BackButton extends React.Component {
 
     render() {
         return (
-            <ArrowLeft onClick={this.onclick} size={24} className="icon"/>
+            <ArrowLeft onClick={this.onclick} size={24} className="icon" />
         )
     }
 }
@@ -285,7 +316,7 @@ export class Background extends React.Component {
     render() {
         var result;
         result = <div className="h-100">
-            <div  className="bg"/>
+            <div className="bg" />
             <Container />
         </div>
         return (result);
@@ -297,6 +328,6 @@ class Navigation {
     constructor() {
         this.setRoutePage = '';
         this.setPackPage = '';
-        this.setPage = '';  
+        this.setPage = '';
     }
 }

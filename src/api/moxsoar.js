@@ -113,7 +113,7 @@ export default class Moxsoar {
     GetRouteDetails(obj, packName, integrationName, routeIndex) {
 
         var r = new MoxsoarResponse();
-        fetch("/api/packs/"+packName +"/"+integrationName +"/"+routeIndex, {
+        fetch("/api/packs/"+packName +"/"+integrationName +"/route/"+routeIndex, {
             method: 'get'
         })
             .then(function (response) {
