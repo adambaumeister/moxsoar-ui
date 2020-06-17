@@ -262,9 +262,48 @@ export default class Moxsoar {
                     r.SetJson(result);
                     cb(r);
                 },
-                // Note: it's important to handle errors here
-                // instead of a catch() block so that we don't swallow
-                // exceptions from actual bugs in components.
+
+                (error) => {
+                    r.SetError(error);
+                    cb(r);
+                }
+            )
+    }
+
+    AddRoute(cb, route) {
+        var b = {
+            "Route": {
+                "Path": route.path,
+                "Methods": [
+                        {
+                            "HttpMethod": route.method,
+                            "ResponseFile": route.filename,
+                            "ResponseCode": route.responsecode,
+                            "ResponseString": route.responsestring
+                        }
+                    ]
+                }
+            }
+        
+        var r = new MoxsoarResponse();
+        fetch("/api/packs/update", {
+            method: 'POST',
+            body: JSON.stringify(b)
+        })
+            .then(function (response) {
+                r.SetResponse(response);
+                if (!response.ok) {
+                    throw "Failed to clone the repository."
+                } else {
+                    return response.json()
+                }
+            })
+            .then(
+                (result) => {
+                    r.SetJson(result);
+                    cb(r);
+                },
+
                 (error) => {
                     r.SetError(error);
                     cb(r);

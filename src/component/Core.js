@@ -31,7 +31,7 @@ export class SelectInput extends React.Component {
 
     render() {
         const selectOptions = this.props.options.map((option) =>
-            <option value="{option}">{option}</option>
+            <option key={option} value={option}>{option}</option>
         );
         return (
             <select name={this.props.name} className="form-control">
@@ -49,6 +49,7 @@ export class TextInput extends React.Component {
         inputClass (str)        : Class to add in addition to bootstrap defaults
         fieldname (str)         : Name of input field
         displayName (str)       : Human readable name of input field
+        onchange (func(input value))       : Function pointer for callback to run when field changes. 
     */
     constructor(props) {
         super(props);
@@ -72,7 +73,44 @@ export class TextInput extends React.Component {
     }
 }
 
+
+export class TextAreaInput extends React.Component {
+    /*
+    generic TextArea controller
+    Props
+        type (str)              : Input type -> defaults to "text"
+        inputClass (str)        : Class to add in addition to bootstrap defaults
+        fieldname (str)         : Name of input field
+        displayName (str)       : Human readable name of input field
+        onchange (func(input value))       : Function pointer for callback to run when field changes. 
+    */
+    constructor(props) {
+        super(props);
+        this.onchange = this.onchange.bind(this);
+    }
+
+    onchange(event) {
+        if (this.props.onchange) {
+            this.props.onchange(event.target.value);
+        }
+    }
+    render() {
+        return (
+            <textarea onChange={this.onchange} type={this.props.type || "text"} className={"form-control " + this.props.inputclass} aria-label={this.props.displayName || this.props.fieldName} name={this.props.fieldName}/>
+        )
+    }
+}
+
+
 export class StatusBar extends React.Component {
+    /*
+    Generic status bar. useful for error and status messages.
+    Props
+        show (bool)      : Display the bar (or not)
+        type (str)       : CSS class of statusbar
+        msg               : msg to display in bar
+
+    */
     render() {
         var style;
         if (this.props.show) {

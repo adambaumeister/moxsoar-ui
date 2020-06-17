@@ -3,7 +3,10 @@ import Moxsoar from '../api/moxsoar';
 import ReactJson from 'react-json-view';
 import XMLViewer from 'react-xml-viewer';
 import { Plus } from 'react-bootstrap-icons';
-import { GenericSubmitButton, TextInput, StatusBar, SelectInput } from './Core'
+import { GenericSubmitButton, TextInput, TextAreaInput, StatusBar, SelectInput } from './Core'
+
+import JSONInput from 'react-json-editor-ajrm';
+import locale    from 'react-json-editor-ajrm/locale/en';
 
 
 import './core.css';
@@ -12,6 +15,7 @@ function getFileType(fileName) {
     var res = fileName.split(".");
     return res[1];
 }
+
 
 class Method extends React.Component {
     render() {
@@ -155,6 +159,42 @@ class AddRouteButton extends React.Component {
 }
 
 class AddRouteForm extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = ({
+            pathInputClass: ""
+        })
+
+        this.parsePathInput = this.parsePathInput.bind(this);
+        this.submit = this.submit.bind(this);
+    }
+
+
+    parsePathInput(value) {
+        var pattern = new RegExp('^/.*');
+        if (pattern.test(value)) {
+            this.setState({ pathInputClass: "bg-success" });
+        } else {
+            this.setState({ pathInputClass: "bg-warn" });
+
+        }
+    }
+
+    submit(e) {
+        e.preventDefault();
+        var data = new FormData(e.target);
+        var m = new Moxsoar();
+        var r = {};
+        r.path = data.get("path");
+        r.responsecode = data.get("responsecode");
+        r.filename = data.get("filename");
+        r.method = data.get("method");
+        r.Responsestring = data.get("responsestring");
+
+        this.props.statuscb("Test!");
+    }
+
     render() {
         var codes = [
             200,
@@ -162,17 +202,32 @@ class AddRouteForm extends React.Component {
             500
         ];
 
+        var methods = [
+            "GET",
+            "POST",
+            "PATCH",
+            "DELETE"
+        ];
+
         return (
             <form onSubmit={this.submit}>
                 <div className="row">
-                    <div className="col">
-                        <TextInput displayName='Route Path' fieldName='path' />
+                    <div className="col-2">
+                        <SelectInput name="method" options={methods} />
                     </div>
                     <div className="col">
-                        <TextInput displayName='Filename' fieldName='filename' />
+                        <TextInput onchange={this.parsePathInput} inputclass={this.state.pathInputClass} displayName='Path' fieldName='path' />
+                    </div>
+                    <div className="col">
+                        <TextInput displayName='File name' fieldName='filename' />
                     </div>
                     <div className="col-2">
-                        <SelectInput name="responsecode" options={codes}/>
+                        <SelectInput name="responsecode" options={codes} />
+                    </div>
+                </div>
+                <div className="row mb-2">
+                    <div className="col text-center">
+                        <TextAreaInput displayName='File name' fieldName='filename' />
                     </div>
                 </div>
                 <div className="row mb-2">
@@ -194,10 +249,13 @@ class Routes extends React.Component {
         this.routes = [];
         var index = 0;
         this.state = ({
-            form: <div></div>
+            form: <div></div>,
+            statusShow: false,
+            statusMsg: ""
         })
 
         this.addRoute = this.addRoute.bind(this);
+        this.status = this.status.bind(this);
 
         for (var route of this.props.routes) {
             this.routes.push(<Route rowId={index} key={index} route={route} packName={this.props.packName} integrationName={this.props.integrationName} />);
@@ -207,13 +265,20 @@ class Routes extends React.Component {
     }
 
     addRoute() {
-        console.log("here");
-        this.setState({ form: <AddRouteForm/> });
+        this.setState({ form: <AddRouteForm statuscb={this.status}/> });
+    }
+
+    status(msg) {
+        this.setState({
+            statusShow: true,
+            statusMsg: msg
+        })
     }
 
     render() {
         return (
             <div className="m-4">
+                <StatusBar type="alert alert-success mt-4 fade show" show={this.state.statusShow} msg={this.state.statusMsg}/>
                 <AddRouteButton addCallback={this.addRoute} />
                 {this.state.form}
                 {this.routes}
