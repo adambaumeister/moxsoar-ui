@@ -6,7 +6,7 @@ import { Plus } from 'react-bootstrap-icons';
 import { GenericSubmitButton, TextInput, TextAreaInput, StatusBar, SelectInput } from './Core'
 
 import JSONInput from 'react-json-editor-ajrm';
-import locale    from 'react-json-editor-ajrm/locale/en';
+import locale from 'react-json-editor-ajrm/locale/en';
 
 
 import './core.css';
@@ -25,8 +25,21 @@ class Method extends React.Component {
         if (res == "json") {
             var j = JSON.parse(this.props.method.ResponseString);
 
-            output = <div className="col json-cover mw-100 p-3 m-3">
-                <ReactJson src={j} theme="ashes" />
+            output = <div className="col m-3">
+                <JSONInput
+                    locale={locale}
+                    height='550px'
+                    width='100%'
+                    placeholder={j}
+                    viewOnly='true'
+                    style={{
+                        outerBox: {
+                            border: '1px solid black',
+                            borderRadius: '5px'
+                        }
+                    }}
+
+                />
             </div>
         } else if (res == "xml") {
             output = <div className="colmw-100 p-3 m-3">
@@ -163,11 +176,13 @@ class AddRouteForm extends React.Component {
     constructor(props) {
         super(props);
         this.state = ({
-            pathInputClass: ""
+            pathInputClass: "",
+            responsestring: ""
         })
 
         this.parsePathInput = this.parsePathInput.bind(this);
         this.submit = this.submit.bind(this);
+        this.updateResponseString = this.updateResponseString.bind(this);
     }
 
 
@@ -187,12 +202,17 @@ class AddRouteForm extends React.Component {
         var m = new Moxsoar();
         var r = {};
         r.path = data.get("path");
-        r.responsecode = data.get("responsecode");
+        r.responsecode = parseInt(data.get("responsecode"));
         r.filename = data.get("filename");
         r.method = data.get("method");
-        r.Responsestring = data.get("responsestring");
+        r.responsestring = data.get("responsestring");
 
-        this.props.statuscb("Test!");
+        m.AddRoute(this.props.statuscb, this.props.packName, this.props.integrationName, r);
+
+    }
+
+    updateResponseString(obj) {
+        this.setState({ responsestring: obj.plainText });
     }
 
     render() {
@@ -226,9 +246,22 @@ class AddRouteForm extends React.Component {
                     </div>
                 </div>
                 <div className="row mb-2">
-                    <div className="col text-center">
-                        <TextAreaInput displayName='File name' fieldName='filename' />
+                    <div className="col">
+                        <JSONInput
+                            id='add_route_editor'
+                            locale={locale}
+                            height='550px'
+                            width='100%'
+                            style={{
+                                outerBox: {
+                                    border: '1px solid black',
+                                    borderRadius: '5px'
+                                }
+                            }}
+                            onChange={this.updateResponseString}
+                        />
                     </div>
+                    <input type="hidden" name="responsestring" value={this.state.responsestring} />
                 </div>
                 <div className="row mb-2">
                     <div className="col text-center">
@@ -251,6 +284,7 @@ class Routes extends React.Component {
         this.state = ({
             form: <div></div>,
             statusShow: false,
+            statusBar: "",
             statusMsg: ""
         })
 
@@ -265,20 +299,39 @@ class Routes extends React.Component {
     }
 
     addRoute() {
-        this.setState({ form: <AddRouteForm statuscb={this.status}/> });
+        this.setState({
+            form: <AddRouteForm
+                packName={this.props.packName}
+                integrationName={this.props.integrationName}
+                statuscb={this.status}
+            />
+        });
     }
 
-    status(msg) {
-        this.setState({
-            statusShow: true,
-            statusMsg: msg
-        })
+    status(result) {
+        if (result.failed) {
+            this.setState({
+                statusBar: <StatusBar
+                    type="alert alert-warning mt-4 fade show"
+                    show={true}
+                    msg={result.error}
+                />
+            })
+        } else {
+            this.setState({
+                statusBar: <StatusBar
+                    type="alert alert-warning mt-4 fade show"
+                    show={true}
+                    msg="Route Added!"
+                />
+            })
+        }
     }
 
     render() {
         return (
             <div className="m-4">
-                <StatusBar type="alert alert-success mt-4 fade show" show={this.state.statusShow} msg={this.state.statusMsg}/>
+                {this.state.statusBar}
                 <AddRouteButton addCallback={this.addRoute} />
                 {this.state.form}
                 {this.routes}

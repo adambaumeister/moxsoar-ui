@@ -184,7 +184,7 @@ export default class Moxsoar {
             .then(function (response) {
                 r.SetResponse(response);
                 if (!response.ok) {
-                    throw "Failed to clone the repository."
+                    throw "Failed to activate pack."
                 } else {
                     return response.json()
                 }
@@ -218,7 +218,7 @@ export default class Moxsoar {
             .then(function (response) {
                 r.SetResponse(response);
                 if (!response.ok) {
-                    throw "Failed to clone the repository."
+                    throw "Failed to add user."
                 } else {
                     return response.json()
                 }
@@ -252,7 +252,7 @@ export default class Moxsoar {
             .then(function (response) {
                 r.SetResponse(response);
                 if (!response.ok) {
-                    throw "Failed to clone the repository."
+                    throw "Failed to update the pack."
                 } else {
                     return response.json()
                 }
@@ -270,7 +270,7 @@ export default class Moxsoar {
             )
     }
 
-    AddRoute(cb, route) {
+    AddRoute(cb, packName, integrationName, route) {
         var b = {
             "Route": {
                 "Path": route.path,
@@ -286,14 +286,14 @@ export default class Moxsoar {
             }
         
         var r = new MoxsoarResponse();
-        fetch("/api/packs/update", {
+        fetch("/api/packs/"+packName +"/"+integrationName +"/route", {
             method: 'POST',
             body: JSON.stringify(b)
         })
             .then(function (response) {
                 r.SetResponse(response);
                 if (!response.ok) {
-                    throw "Failed to clone the repository."
+                    throw "Failed to add route."
                 } else {
                     return response.json()
                 }
