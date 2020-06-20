@@ -325,6 +325,7 @@ class Routes extends React.Component {
                     msg="Route Added!"
                 />
             })
+            this.props.getRoutes();
         }
     }
 
@@ -345,13 +346,21 @@ export default class IntegrationPage extends React.Component {
     constructor(props) {
         super(props);
         this.setDetails = this.setDetails.bind(this);
-        this.state = {
+        this.state = ({
             retrieved: false,
-            integration: {}
-        }
+            integration: {},
+            routes: []
+        })
+
+        this.getRoutes = this.getRoutes.bind(this);
     }
 
     componentDidMount() {
+        var m = new Moxsoar();
+        m.GetIntegrationDetails(this, this.props.packName, this.props.integrationName);
+    }
+
+    getRoutes() {
         var m = new Moxsoar();
         m.GetIntegrationDetails(this, this.props.packName, this.props.integrationName);
     }
@@ -361,6 +370,7 @@ export default class IntegrationPage extends React.Component {
             integration: result.json,
             retrieved: true
         })
+        console.log("updated state")
     }
 
     render() {
@@ -370,7 +380,12 @@ export default class IntegrationPage extends React.Component {
             )
         } else {
             return (
-                <Routes routes={this.state.integration.Routes} packName={this.props.packName} integrationName={this.props.integrationName} />
+                <Routes
+                routes={this.state.integration.Routes}
+                packName={this.props.packName}
+                integrationName={this.props.integrationName} 
+                getRoutes={this.getRoutes}
+                />
             )
         }
     }
