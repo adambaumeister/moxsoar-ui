@@ -285,18 +285,41 @@ class Routes extends React.Component {
             form: <div></div>,
             statusShow: false,
             statusBar: "",
-            statusMsg: ""
+            statusMsg: "",
+            routes: []
         })
 
         this.addRoute = this.addRoute.bind(this);
         this.status = this.status.bind(this);
+        this.setDetails = this.setDetails.bind(this);
+        this.getRoutes = this.getRoutes.bind(this);
 
-        for (var route of this.props.routes) {
-            this.routes.push(<Route rowId={index} key={index} route={route} packName={this.props.packName} integrationName={this.props.integrationName} />);
+    }
+
+    componentDidMount() {
+        this.getRoutes();
+    }
+
+    getRoutes() {
+        var m = new Moxsoar();
+        m.GetIntegrationDetails(this, this.props.packName, this.props.integrationName);
+    }
+
+    setDetails(result) {
+        var routesFromJson = [];
+        var index = 0;
+        for (var route of result.json.Routes) {
+            routesFromJson.push(<Route rowId={index} key={index} route={route} packName={this.props.packName} integrationName={this.props.integrationName} />);
             index++;
         }
 
+        this.setState({
+            integration: result.json,
+            retrieved: true,
+            routes: routesFromJson
+        })
     }
+
 
     addRoute() {
         this.setState({
@@ -320,12 +343,12 @@ class Routes extends React.Component {
         } else {
             this.setState({
                 statusBar: <StatusBar
-                    type="alert alert-warning mt-4 fade show"
+                    type="alert alert-success mt-4 fade show"
                     show={true}
                     msg="Route Added!"
                 />
             })
-            this.props.getRoutes();
+           this.getRoutes();
         }
     }
 
@@ -335,7 +358,7 @@ class Routes extends React.Component {
                 {this.state.statusBar}
                 <AddRouteButton addCallback={this.addRoute} />
                 {this.state.form}
-                {this.routes}
+                {this.state.routes}
             </div>
         )
     }
@@ -345,48 +368,14 @@ export default class IntegrationPage extends React.Component {
 
     constructor(props) {
         super(props);
-        this.setDetails = this.setDetails.bind(this);
-        this.state = ({
-            retrieved: false,
-            integration: {},
-            routes: []
-        })
-
-        this.getRoutes = this.getRoutes.bind(this);
-    }
-
-    componentDidMount() {
-        var m = new Moxsoar();
-        m.GetIntegrationDetails(this, this.props.packName, this.props.integrationName);
-    }
-
-    getRoutes() {
-        var m = new Moxsoar();
-        m.GetIntegrationDetails(this, this.props.packName, this.props.integrationName);
-    }
-
-    setDetails(result) {
-        this.setState({
-            integration: result.json,
-            retrieved: true
-        })
-        console.log("updated state")
     }
 
     render() {
-        if (!this.state.retrieved) {
-            return (
-                <div>Loading...</div>
-            )
-        } else {
-            return (
-                <Routes
-                routes={this.state.integration.Routes}
+        return (
+            <Routes
                 packName={this.props.packName}
-                integrationName={this.props.integrationName} 
-                getRoutes={this.getRoutes}
-                />
-            )
-        }
+                integrationName={this.props.integrationName}
+            />
+        )
     }
 }
