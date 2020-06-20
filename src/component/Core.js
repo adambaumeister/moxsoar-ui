@@ -4,7 +4,7 @@ import logo from '../moxsoar_logo.svg';
 import Moxsoar from '../api/moxsoar';
 import GetCookie from '../funcs/cookies';
 import { Main } from './Packs';
-import { ArrowLeft, Tools, QuestionCircle } from 'react-bootstrap-icons';
+import { ArrowLeft, Tools, QuestionCircle, Plus, Dash } from 'react-bootstrap-icons';
 
 
 
@@ -96,7 +96,7 @@ export class TextAreaInput extends React.Component {
     }
     render() {
         return (
-            <textarea onChange={this.onchange} type={this.props.type || "text"} className={"form-control " + this.props.inputclass} aria-label={this.props.displayName || this.props.fieldName} name={this.props.fieldName}/>
+            <textarea onChange={this.onchange} type={this.props.type || "text"} className={"form-control " + this.props.inputclass} aria-label={this.props.displayName || this.props.fieldName} name={this.props.fieldName} />
         )
     }
 }
@@ -120,6 +120,51 @@ export class StatusBar extends React.Component {
         }
         return (
             <div className={this.props.type} style={style}>{this.props.msg}</div>
+        )
+    }
+}
+
+export class ToggleButton extends React.Component {
+    /*
+    Toggle button
+    Click it and it changes!
+
+    props
+        callback(func())    : Callback to run onClick
+    */
+    constructor(props) {
+        super(props);
+        this.state = ({
+            icon: <Plus size={48} />,
+            clicked: false
+        })
+        this.clicked = this.clicked.bind(this);
+    }
+
+    clicked() {
+        if (!this.state.clicked) {
+            this.setState({
+                icon: <Dash size={48} />,
+                clicked: true,
+            })
+        } else {
+            this.setState({
+                icon: <Plus size={48} />,
+                clicked: false
+            })
+        }
+        this.props.callback();
+    }
+
+
+    render() {
+        return (
+            <button
+                onClick={this.clicked}
+                className="mb-2 btn btn-secondary w-100 text-center text-primary text-dark"
+            >
+                {this.state.icon}
+            </button>
         )
     }
 }

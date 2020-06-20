@@ -2,8 +2,8 @@ import React from 'react';
 import Moxsoar from '../api/moxsoar';
 import ReactJson from 'react-json-view';
 import XMLViewer from 'react-xml-viewer';
-import { Plus } from 'react-bootstrap-icons';
-import { GenericSubmitButton, TextInput, TextAreaInput, StatusBar, SelectInput } from './Core'
+import { Plus, Columns } from 'react-bootstrap-icons';
+import { GenericSubmitButton, TextInput, TextAreaInput, StatusBar, SelectInput, ToggleButton } from './Core'
 
 import JSONInput from 'react-json-editor-ajrm';
 import locale from 'react-json-editor-ajrm/locale/en';
@@ -157,20 +157,6 @@ class Route extends React.Component {
     }
 }
 
-class AddRouteButton extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        return (
-            <button onClick={this.props.addCallback} className="mb-2 btn btn-secondary w-100 text-center text-primary text-dark">
-                <Plus size={48} />
-            </button>
-        )
-    }
-}
-
 class AddRouteForm extends React.Component {
 
     constructor(props) {
@@ -283,6 +269,7 @@ class Routes extends React.Component {
         var index = 0;
         this.state = ({
             form: <div></div>,
+            addFormOpen: false,
             statusShow: false,
             statusBar: "",
             statusMsg: "",
@@ -322,13 +309,21 @@ class Routes extends React.Component {
 
 
     addRoute() {
-        this.setState({
-            form: <AddRouteForm
-                packName={this.props.packName}
-                integrationName={this.props.integrationName}
-                statuscb={this.status}
-            />
-        });
+        if (!this.state.addFormOpen) {
+            this.setState({
+                form: <AddRouteForm
+                    packName={this.props.packName}
+                    integrationName={this.props.integrationName}
+                    statuscb={this.status}
+                />,
+                addFormOpen: true
+            });
+        } else {
+            this.setState({
+                form: <div />,
+                addFormOpen: false
+            })
+        }
     }
 
     status(result) {
@@ -348,7 +343,7 @@ class Routes extends React.Component {
                     msg="Route Added!"
                 />
             })
-           this.getRoutes();
+            this.getRoutes();
         }
     }
 
@@ -356,7 +351,7 @@ class Routes extends React.Component {
         return (
             <div className="m-4">
                 {this.state.statusBar}
-                <AddRouteButton addCallback={this.addRoute} />
+                <ToggleButton callback={this.addRoute} />
                 {this.state.form}
                 {this.state.routes}
             </div>
