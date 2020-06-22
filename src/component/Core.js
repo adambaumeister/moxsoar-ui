@@ -124,10 +124,110 @@ export class StatusBar extends React.Component {
     }
 }
 
+class RadioButton extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        var c = "btn btn-light";
+        if (this.props.active) {
+            c = c + " active"
+        }
+
+        return (
+            <label className={c}>
+                <input
+                    type="radio"
+                    name={this.props.name}
+                    id={this.props.value}
+                    onChange={this.props.callback}
+                    value={this.props.value}
+                    checked={this.props.active}
+                /> {this.props.value}
+            </label>
+        )
+    }
+
+}
+
+export class RadioButtons extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.buttonChanged = this.buttonChanged.bind(this);
+
+        var radioOptions = this.props.options.map((option) => {
+            if (option === this.props.active) {
+                return <RadioButton
+                    key={option}
+                    name={this.props.name}
+                    value={option}
+                    callback={this.buttonChanged}
+                    active={true}
+                    checked={true}
+                />
+            } else {
+                return <RadioButton
+                    key={option}
+                    name={this.props.name}
+                    value={option}
+                    callback={this.buttonChanged}
+                    active={false}
+                />
+            }
+
+        }
+
+
+
+        );
+        this.state = ({
+            radioOptions: radioOptions
+        })
+    }
+
+    buttonChanged(event) {
+        var active = event.target.value;
+        var radioOptions = this.props.options.map((option) => {
+            if (option === active) {
+
+                return <RadioButton
+                    key={option}
+                    name={this.props.name}
+                    value={option}
+                    callback={this.buttonChanged}
+                    active={true}
+                />
+            } else {
+                return <RadioButton
+                    key={option}
+                    name={this.props.name}
+                    value={option}
+                    callback={this.buttonChanged}
+                    active={false}
+                />
+            }
+        });
+
+        this.props.callback(active);
+        this.setState({
+            radioOptions: radioOptions
+        })
+    }
+
+    render() {
+        return (
+            <div className="btn-group btn-group-toggle w-50" data-toggle="buttons">
+                {this.state.radioOptions}
+            </div>
+        )
+    }
+}
+
 export class ToggleButton extends React.Component {
     /*
-    Toggle button
-    Click it and it changes!
+    Generic Toggle button. Click it and it changes!
 
     props
         callback(func())    : Callback to run onClick

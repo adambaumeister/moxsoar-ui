@@ -2,8 +2,11 @@ import React from 'react';
 import Moxsoar from '../api/moxsoar';
 import ReactJson from 'react-json-view';
 import XMLViewer from 'react-xml-viewer';
-import { Plus, Columns } from 'react-bootstrap-icons';
-import { GenericSubmitButton, TextInput, TextAreaInput, StatusBar, SelectInput, ToggleButton } from './Core'
+import { RadioButtons, TextInput, TextAreaInput, StatusBar, SelectInput, ToggleButton } from './Core'
+
+import AceEditor from 'react-ace';
+import "ace-builds/src-noconflict/mode-xml";
+import "ace-builds/src-noconflict/theme-github";
 
 import JSONInput from 'react-json-editor-ajrm';
 import locale from 'react-json-editor-ajrm/locale/en';
@@ -161,14 +164,33 @@ class AddRouteForm extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = ({
-            pathInputClass: "",
-            responsestring: ""
-        })
 
         this.parsePathInput = this.parsePathInput.bind(this);
         this.submit = this.submit.bind(this);
         this.updateResponseString = this.updateResponseString.bind(this);
+        this.updateResponseStringAce = this.updateResponseStringAce.bind(this);
+
+        this.changeInputType = this.changeInputType.bind(this);
+
+        this.state = ({
+            pathInputClass: "",
+            responsestring: "",
+            inputType: "JSON",
+            responseInput: <JSONInput
+                id='add_route_editor'
+                locale={locale}
+                height='550px'
+                width='100%'
+                style={{
+                    outerBox: {
+                        border: '1px solid black',
+                        borderRadius: '5px'
+                    }
+                }}
+                onChange={this.updateResponseString}
+            />
+        })
+
     }
 
 
@@ -180,6 +202,44 @@ class AddRouteForm extends React.Component {
             this.setState({ pathInputClass: "bg-warn" });
 
         }
+    }
+
+    changeInputType(type) {
+        var rb;
+        if (type === "JSON") {
+            rb = <JSONInput
+                id='add_route_editor'
+                locale={locale}
+                height='550px'
+                width='100%'
+                style={{
+                    outerBox: {
+                        border: '1px solid black',
+                        borderRadius: '5px'
+                    }
+                }}
+                onChange={this.updateResponseString}
+            />
+        } else {
+            //rb = <input name="responsestringText" className="w-100" style={{ height: 550 }} />
+            rb = <AceEditor
+                mode="xml"
+                theme="github"
+                name="UNIQUE_ID_OF_DIV"
+                onChange={this.updateResponseStringAce}
+
+                editorProps={{ $blockScrolling: true }}
+                setOptions={{
+                    useWorker: false
+                }}
+            />
+        }
+
+
+        this.setState({
+            inputType: type,
+            responseInput: rb
+        })
     }
 
     submit(e) {
@@ -197,6 +257,10 @@ class AddRouteForm extends React.Component {
 
     }
 
+    updateResponseStringAce(obj) {
+        this.setState({ responsestring: obj });
+    }
+
     updateResponseString(obj) {
         this.setState({ responsestring: obj.plainText });
     }
@@ -211,12 +275,26 @@ class AddRouteForm extends React.Component {
         var methods = [
             "GET",
             "POST",
+            "PUT",
+            "HEAD",
             "PATCH",
-            "DELETE"
+            "DELETE",
+            "OPTIONS"
         ];
+
+        const types = [
+            "JSON",
+            "Text"
+        ]
 
         return (
             <form onSubmit={this.submit}>
+                <div className="row text-center">
+                    <div className="col">
+                        <h3 className="text-light m-3">New Response</h3>
+                        <hr />
+                    </div>
+                </div>
                 <div className="row">
                     <div className="col-2">
                         <SelectInput name="method" options={methods} />
@@ -231,21 +309,14 @@ class AddRouteForm extends React.Component {
                         <SelectInput name="responsecode" options={codes} />
                     </div>
                 </div>
+                <div className="row">
+                    <div className="col text-center">
+                        <RadioButtons active="JSON" options={types} callback={this.changeInputType} />
+                    </div>
+                </div>
                 <div className="row mb-2">
                     <div className="col">
-                        <JSONInput
-                            id='add_route_editor'
-                            locale={locale}
-                            height='550px'
-                            width='100%'
-                            style={{
-                                outerBox: {
-                                    border: '1px solid black',
-                                    borderRadius: '5px'
-                                }
-                            }}
-                            onChange={this.updateResponseString}
-                        />
+                        {this.state.responseInput}
                     </div>
                     <input type="hidden" name="responsestring" value={this.state.responsestring} />
                 </div>
