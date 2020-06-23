@@ -225,7 +225,10 @@ class AddRouteForm extends React.Component {
             rb = <AceEditor
                 mode="xml"
                 theme="github"
-                name="UNIQUE_ID_OF_DIV"
+                name="add_route_editor_xml"
+                width="100%"
+                height='550px'
+
                 onChange={this.updateResponseStringAce}
 
                 editorProps={{ $blockScrolling: true }}
@@ -284,7 +287,7 @@ class AddRouteForm extends React.Component {
 
         const types = [
             "JSON",
-            "Text"
+            "XML"
         ]
 
         return (
@@ -324,7 +327,7 @@ class AddRouteForm extends React.Component {
                     <div className="col text-center">
                         <button type="submit" className="btn btn-secondary text-light ">
                             Add
-                    </button>
+                        </button>
                     </div>
                 </div>
             </form>
