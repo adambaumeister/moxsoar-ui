@@ -2,7 +2,8 @@ import React from 'react';
 import Moxsoar from '../api/moxsoar';
 import ReactJson from 'react-json-view';
 import XMLViewer from 'react-xml-viewer';
-import { RadioButtons, TextInput, TextAreaInput, StatusBar, SelectInput, ToggleButton } from './Core'
+import { TrashFill } from 'react-bootstrap-icons';
+import { RadioButtons, TextInput, TextAreaInput, StatusBar, SelectInput, ToggleButton, GenericSubmitButton } from './Core'
 
 import AceEditor from 'react-ace';
 import "ace-builds/src-noconflict/mode-xml";
@@ -140,7 +141,7 @@ class Route extends React.Component {
         }
         return (
             <div>
-                <button onClick={this.displayMethod} data-toggle="collapse" className="mb-2 btn btn-primary w-100 text-left">
+                <div onClick={this.displayMethod} data-toggle="collapse" className="mb-2 btn btn-primary w-100 text-left">
                     <div className="row">
                         <div className="col">
                             <h4>{this.props.route.Path}</h4>
@@ -150,9 +151,15 @@ class Route extends React.Component {
                                 {methods}
                             </h4>
                         </div>
+                        <div className="col text-right p-1">
+                            <DeleteButton
+                                callback={this.props.deleteRoute}
+                                path={this.props.route.Path}
+                            />
+                        </div>
                     </div>
 
-                </button>
+                </div>
                 {this.state.methodDisplay}
             </div>
 
@@ -176,6 +183,7 @@ class AddRouteForm extends React.Component {
             pathInputClass: "",
             responsestring: "",
             inputType: "JSON",
+            submitValue: "Add",
             responseInput: <JSONInput
                 id='add_route_editor'
                 locale={locale}
@@ -246,6 +254,9 @@ class AddRouteForm extends React.Component {
     }
 
     submit(e) {
+        this.setState({
+            submitValue: "Loading..."
+        })
         e.preventDefault();
         var data = new FormData(e.target);
         var m = new Moxsoar();
@@ -325,9 +336,7 @@ class AddRouteForm extends React.Component {
                 </div>
                 <div className="row mb-2">
                     <div className="col text-center">
-                        <button type="submit" className="btn btn-secondary text-light ">
-                            Add
-                        </button>
+                        <GenericSubmitButton text={this.state.submitValue} />
                     </div>
                 </div>
             </form>
@@ -354,6 +363,7 @@ class Routes extends React.Component {
         this.status = this.status.bind(this);
         this.setDetails = this.setDetails.bind(this);
         this.getRoutes = this.getRoutes.bind(this);
+        this.deleteRoute = this.deleteRoute.bind(this);
 
     }
 
@@ -370,7 +380,15 @@ class Routes extends React.Component {
         var routesFromJson = [];
         var index = 0;
         for (var route of result.json.Routes) {
-            routesFromJson.push(<Route rowId={index} key={index} route={route} packName={this.props.packName} integrationName={this.props.integrationName} />);
+            routesFromJson.push(
+                <Route
+                    rowId={index}
+                    key={index}
+                    route={route}
+                    packName={this.props.packName}
+                    integrationName={this.props.integrationName}
+                    deleteRoute={this.deleteRoute}
+                />);
             index++;
         }
 
@@ -400,6 +418,16 @@ class Routes extends React.Component {
         }
     }
 
+    deleteRoute(path) {
+        var m = new Moxsoar();
+        m.DeleteRoute(
+            this.status,
+            this.props.packName,
+            this.props.integrationName,
+            path
+        )
+    }
+
     status(result) {
         if (result.failed) {
             this.setState({
@@ -414,7 +442,7 @@ class Routes extends React.Component {
                 statusBar: <StatusBar
                     type="alert alert-success mt-4 fade show"
                     show={true}
-                    msg="Route Added!"
+                    msg={result.json["Message"]}
                 />
             })
             this.getRoutes();
@@ -445,6 +473,25 @@ export default class IntegrationPage extends React.Component {
                 packName={this.props.packName}
                 integrationName={this.props.integrationName}
             />
+        )
+    }
+}
+
+class DeleteButton extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.clicked = this.clicked.bind(this)
+    }
+
+    clicked(e) {
+        e.stopPropagation();
+        this.props.callback(this.props.path);
+    }
+
+    render() {
+        return (
+            <TrashFill onClick={this.clicked} color="#dc3545" className="icon" size={24} />
         )
     }
 }

@@ -62,7 +62,7 @@ export default class Moxsoar {
     GetPackDetails(obj, packName) {
 
         var r = new MoxsoarResponse();
-        fetch("/api/packs/"+packName, {
+        fetch("/api/packs/" + packName, {
             method: 'get'
         })
             .then(function (response) {
@@ -87,7 +87,7 @@ export default class Moxsoar {
     GetIntegrationDetails(obj, packName, integrationName) {
 
         var r = new MoxsoarResponse();
-        fetch("/api/packs/"+packName +"/"+integrationName, {
+        fetch("/api/packs/" + packName + "/" + integrationName, {
             method: 'get'
         })
             .then(function (response) {
@@ -113,7 +113,7 @@ export default class Moxsoar {
     GetRouteDetails(obj, packName, integrationName, routeIndex) {
 
         var r = new MoxsoarResponse();
-        fetch("/api/packs/"+packName +"/"+integrationName +"/route/"+routeIndex, {
+        fetch("/api/packs/" + packName + "/" + integrationName + "/route/" + routeIndex, {
             method: 'get'
         })
             .then(function (response) {
@@ -170,7 +170,7 @@ export default class Moxsoar {
             )
     }
 
-    
+
     ActivatePack(obj, packName) {
 
         var b = {
@@ -238,7 +238,7 @@ export default class Moxsoar {
             )
     }
 
-    
+
     UpdatePack(cb, packName) {
 
         var b = {
@@ -275,18 +275,18 @@ export default class Moxsoar {
             "Route": {
                 "Path": route.path,
                 "Methods": [
-                        {
-                            "HttpMethod": route.method,
-                            "ResponseFile": route.filename,
-                            "ResponseCode": route.responsecode,
-                            "ResponseString": route.responsestring
-                        }
-                    ]
-                }
+                    {
+                        "HttpMethod": route.method,
+                        "ResponseFile": route.filename,
+                        "ResponseCode": route.responsecode,
+                        "ResponseString": route.responsestring
+                    }
+                ]
             }
-        
+        }
+
         var r = new MoxsoarResponse();
-        fetch("/api/packs/"+packName +"/"+integrationName +"/route", {
+        fetch("/api/packs/" + packName + "/" + integrationName + "/route", {
             method: 'POST',
             body: JSON.stringify(b)
         })
@@ -294,6 +294,36 @@ export default class Moxsoar {
                 r.SetResponse(response);
                 if (!response.ok) {
                     throw "Failed to add route."
+                } else {
+                    return response.json()
+                }
+            })
+            .then(
+                (result) => {
+                    r.SetJson(result);
+                    cb(r);
+                },
+
+                (error) => {
+                    r.SetError(error);
+                    cb(r);
+                }
+            )
+    }
+
+    DeleteRoute(cb, packName, integrationName, pathName) {
+        var b = {
+            "Path": pathName
+        }
+        var r = new MoxsoarResponse();
+        fetch("/api/packs/" + packName + "/" + integrationName + "/route", {
+            method: 'DELETE',
+            body: JSON.stringify(b)
+        })
+            .then(function (response) {
+                r.SetResponse(response);
+                if (!response.ok) {
+                    throw "Failed to delete route."
                 } else {
                     return response.json()
                 }
@@ -338,7 +368,7 @@ export class MoxsoarResponse {
         if (typeof error != "string") {
             this.error = "Failed to connect to the MOXSOAR API server."
         } else {
-            this.error = error; 
+            this.error = error;
         }
     }
 }

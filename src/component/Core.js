@@ -270,10 +270,19 @@ export class ToggleButton extends React.Component {
 }
 
 export class GenericSubmitButton extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = ({
+            text: this.props.text || "Submit"
+        })
+
+    }
+
+
     render() {
         return (
             <button type="submit" className="btn btn-primary">
-                Submit
+                {this.state.text}
             </button>
         )
     }
