@@ -178,6 +178,7 @@ class AddRouteForm extends React.Component {
         this.updateResponseStringAce = this.updateResponseStringAce.bind(this);
 
         this.changeInputType = this.changeInputType.bind(this);
+        this.parseFileInput = this.parseFileInput.bind(this);
 
         this.state = ({
             pathInputClass: "",
@@ -207,7 +208,23 @@ class AddRouteForm extends React.Component {
         if (pattern.test(value)) {
             this.setState({ pathInputClass: "bg-success" });
         } else {
-            this.setState({ pathInputClass: "bg-warn" });
+            this.setState({ pathInputClass: "bg-warning" });
+
+        }
+    }
+
+    parseFileInput(value) {
+        var pattern = new RegExp('(\.json|\.xml|\.txt)');
+        if (pattern.test(value)) {
+            this.setState({ 
+                fileInputClass: "bg-success", 
+                inputMessage: ""
+            });
+        } else {
+            this.setState({ 
+                fileInputClass: "bg-warning",
+                inputMessage: "Please enter a filename ending in json, xml, or txt."
+             });
 
         }
     }
@@ -310,6 +327,11 @@ class AddRouteForm extends React.Component {
                     </div>
                 </div>
                 <div className="row">
+                    <div className="col text-center text-warning mb-3">
+                        {this.state.inputMessage}
+                    </div>
+                </div>
+                <div className="row">
                     <div className="col-2">
                         <SelectInput name="method" options={methods} />
                     </div>
@@ -317,7 +339,7 @@ class AddRouteForm extends React.Component {
                         <TextInput onchange={this.parsePathInput} inputclass={this.state.pathInputClass} displayName='Path' fieldName='path' />
                     </div>
                     <div className="col">
-                        <TextInput displayName='File name' fieldName='filename' />
+                        <TextInput onchange={this.parseFileInput} inputclass={this.state.fileInputClass} displayName='File name' fieldName='filename' />
                     </div>
                     <div className="col-2">
                         <SelectInput name="responsecode" options={codes} />
