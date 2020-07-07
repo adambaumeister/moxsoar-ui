@@ -3,8 +3,8 @@ import './core.css';
 import logo from '../moxsoar_logo.svg';
 import Moxsoar from '../api/moxsoar';
 import GetCookie from '../funcs/cookies';
-import {Main} from './Packs';
-import { ArrowLeft, Tools, QuestionCircle } from 'react-bootstrap-icons';
+import { Main } from './Packs';
+import { ArrowLeft, Tools, QuestionCircle, Plus, Dash } from 'react-bootstrap-icons';
 
 
 
@@ -18,7 +18,39 @@ class LoginButton extends React.Component {
     }
 }
 
+export class SelectInput extends React.Component {
+    /*
+    generic SelectInput controller
+    Props
+        options (array) : List of items to display as selectable values
+        name (str)      : Name of select field.
+    */
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        const selectOptions = this.props.options.map((option) =>
+            <option key={option} value={option}>{option}</option>
+        );
+        return (
+            <select name={this.props.name} className="form-control">
+                {selectOptions}
+            </select>
+        )
+    }
+}
+
 export class TextInput extends React.Component {
+    /*
+    generic TextInput controller
+    Props
+        type (str)              : Input type -> defaults to "text"
+        inputClass (str)        : Class to add in addition to bootstrap defaults
+        fieldname (str)         : Name of input field
+        displayName (str)       : Human readable name of input field
+        onchange (func(input value))       : Function pointer for callback to run when field changes. 
+    */
     constructor(props) {
         super(props);
         this.onchange = this.onchange.bind(this);
@@ -41,7 +73,44 @@ export class TextInput extends React.Component {
     }
 }
 
+
+export class TextAreaInput extends React.Component {
+    /*
+    generic TextArea controller
+    Props
+        type (str)              : Input type -> defaults to "text"
+        inputClass (str)        : Class to add in addition to bootstrap defaults
+        fieldname (str)         : Name of input field
+        displayName (str)       : Human readable name of input field
+        onchange (func(input value))       : Function pointer for callback to run when field changes. 
+    */
+    constructor(props) {
+        super(props);
+        this.onchange = this.onchange.bind(this);
+    }
+
+    onchange(event) {
+        if (this.props.onchange) {
+            this.props.onchange(event.target.value);
+        }
+    }
+    render() {
+        return (
+            <textarea onChange={this.onchange} type={this.props.type || "text"} className={"form-control " + this.props.inputclass} aria-label={this.props.displayName || this.props.fieldName} name={this.props.fieldName} />
+        )
+    }
+}
+
+
 export class StatusBar extends React.Component {
+    /*
+    Generic status bar. useful for error and status messages.
+    Props
+        show (bool)      : Display the bar (or not)
+        type (str)       : CSS class of statusbar
+        msg               : msg to display in bar
+
+    */
     render() {
         var style;
         if (this.props.show) {
@@ -55,11 +124,165 @@ export class StatusBar extends React.Component {
     }
 }
 
+class RadioButton extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        var c = "btn btn-light";
+        if (this.props.active) {
+            c = c + " active"
+        }
+
+        return (
+            <label className={c}>
+                <input
+                    type="radio"
+                    name={this.props.name}
+                    id={this.props.value}
+                    onChange={this.props.callback}
+                    value={this.props.value}
+                    checked={this.props.active}
+                /> {this.props.value}
+            </label>
+        )
+    }
+
+}
+
+export class RadioButtons extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.buttonChanged = this.buttonChanged.bind(this);
+
+        var radioOptions = this.props.options.map((option) => {
+            if (option === this.props.active) {
+                return <RadioButton
+                    key={option}
+                    name={this.props.name}
+                    value={option}
+                    callback={this.buttonChanged}
+                    active={true}
+                    checked={true}
+                />
+            } else {
+                return <RadioButton
+                    key={option}
+                    name={this.props.name}
+                    value={option}
+                    callback={this.buttonChanged}
+                    active={false}
+                />
+            }
+
+        }
+
+
+
+        );
+        this.state = ({
+            radioOptions: radioOptions
+        })
+    }
+
+    buttonChanged(event) {
+        var active = event.target.value;
+        var radioOptions = this.props.options.map((option) => {
+            if (option === active) {
+
+                return <RadioButton
+                    key={option}
+                    name={this.props.name}
+                    value={option}
+                    callback={this.buttonChanged}
+                    active={true}
+                />
+            } else {
+                return <RadioButton
+                    key={option}
+                    name={this.props.name}
+                    value={option}
+                    callback={this.buttonChanged}
+                    active={false}
+                />
+            }
+        });
+
+        this.props.callback(active);
+        this.setState({
+            radioOptions: radioOptions
+        })
+    }
+
+    render() {
+        return (
+            <div className="btn-group btn-group-toggle w-50" data-toggle="buttons">
+                {this.state.radioOptions}
+            </div>
+        )
+    }
+}
+
+export class ToggleButton extends React.Component {
+    /*
+    Generic Toggle button. Click it and it changes!
+
+    props
+        callback(func())    : Callback to run onClick
+    */
+    constructor(props) {
+        super(props);
+        this.state = ({
+            icon: <Plus size={48} />,
+            clicked: false
+        })
+        this.clicked = this.clicked.bind(this);
+    }
+
+    clicked() {
+        if (!this.state.clicked) {
+            this.setState({
+                icon: <Dash size={48} />,
+                clicked: true,
+            })
+        } else {
+            this.setState({
+                icon: <Plus size={48} />,
+                clicked: false
+            })
+        }
+        this.props.callback();
+    }
+
+
+    render() {
+        return (
+            <button
+                onClick={this.clicked}
+                className="mb-2 btn btn-secondary w-100 text-center text-primary text-dark"
+            >
+                {this.state.icon}
+            </button>
+        )
+    }
+}
+
 export class GenericSubmitButton extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = ({
+            text: this.props.text || "Submit"
+        })
+
+    }
+
+
     render() {
         return (
             <button type="submit" className="btn btn-primary">
-                Submit
+                {this.state.text}
             </button>
         )
     }
@@ -125,7 +348,7 @@ class LoginBox extends React.Component {
 
 class Footer extends React.Component {
     render() {
-        return(
+        return (
             <div className="text-center text-light">
                 <small>
                     Logged in as {this.props.username}
@@ -177,20 +400,20 @@ export class Container extends React.Component {
     }
 
     setPage(pageValue) {
-        this.setState({page: pageValue})
+        this.setState({ page: pageValue })
     }
 
     setRoutePage(packName, integrationName) {
         console.log(packName);
         this.setState({
-            page: "integration", 
-            packName: packName, 
+            page: "integration",
+            packName: packName,
             integrationName: integrationName
         });
     }
-    
+
     setPackPage(pageValue, packName) {
-        this.setState({page: pageValue, packName: packName})
+        this.setState({ page: pageValue, packName: packName })
     }
 
     render() {
@@ -205,13 +428,13 @@ export class Container extends React.Component {
                 <div className="h-100 row justify-content-center align-items-center">
                     <div className="col">
                         <div className="m-2">
-                            <BackButton onclick={this.setPage}/>
-                            <SettingsButton onclick={this.setPage}/>
-                            <HelpButton/>
+                            <BackButton onclick={this.setPage} />
+                            <SettingsButton onclick={this.setPage} />
+                            <HelpButton />
                         </div>
 
-                        <Main page={this.state.page} nav={this.nav} packName={this.state.packName} integrationName={this.state.integrationName} username={this.state.username}/>
-                        <Footer username={this.state.username}/>
+                        <Main page={this.state.page} nav={this.nav} packName={this.state.packName} integrationName={this.state.integrationName} username={this.state.username} />
+                        <Footer username={this.state.username} />
                     </div>
                 </div>
             </div>
@@ -239,7 +462,7 @@ class SettingsButton extends React.Component {
 
     render() {
         return (
-            <Tools onClick={this.onclick} size={24} className="icon"/>
+            <Tools onClick={this.onclick} size={24} className="icon" />
         )
     }
 }
@@ -257,7 +480,7 @@ class HelpButton extends React.Component {
 
     render() {
         return (
-            <QuestionCircle onClick={this.onclick} size={24} className="icon"/>
+            <QuestionCircle onClick={this.onclick} size={24} className="icon" />
         )
     }
 }
@@ -276,7 +499,7 @@ class BackButton extends React.Component {
 
     render() {
         return (
-            <ArrowLeft onClick={this.onclick} size={24} className="icon"/>
+            <ArrowLeft onClick={this.onclick} size={24} className="icon" />
         )
     }
 }
@@ -285,7 +508,7 @@ export class Background extends React.Component {
     render() {
         var result;
         result = <div className="h-100">
-            <div  className="bg"/>
+            <div className="bg" />
             <Container />
         </div>
         return (result);
@@ -297,6 +520,6 @@ class Navigation {
     constructor() {
         this.setRoutePage = '';
         this.setPackPage = '';
-        this.setPage = '';  
+        this.setPage = '';
     }
 }
