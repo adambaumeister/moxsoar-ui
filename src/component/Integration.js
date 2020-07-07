@@ -7,7 +7,11 @@ import { RadioButtons, TextInput, TextAreaInput, StatusBar, SelectInput, ToggleB
 
 import AceEditor from 'react-ace';
 import "ace-builds/src-noconflict/mode-xml";
+import "ace-builds/src-noconflict/mode-json";
+
 import "ace-builds/src-noconflict/theme-github";
+import "ace-builds/src-noconflict/theme-monokai";
+
 
 import JSONInput from 'react-json-editor-ajrm';
 import locale from 'react-json-editor-ajrm/locale/en';
@@ -27,6 +31,7 @@ class Method extends React.Component {
 
         var output;
         if (res == "json") {
+
             var j = JSON.parse(this.props.method.ResponseString);
 
             output = <div className="col m-3">
@@ -125,9 +130,9 @@ class Route extends React.Component {
     }
 
     setDetails(result) {
+
         var j = result.json;
         var m = <Methods route={j} />
-
         this.setState({
             methodDisplay: m,
             methodDisplayed: true
@@ -185,18 +190,24 @@ class AddRouteForm extends React.Component {
             responsestring: "",
             inputType: "JSON",
             submitValue: "Add",
-            responseInput: <JSONInput
-                id='add_route_editor'
-                locale={locale}
+            responseInput: <AceEditor
+                mode="json"
+                theme="monokai"
+                name="add_route_editor_json"
+                width="100%"
                 height='550px'
-                width='100%'
-                style={{
-                    outerBox: {
-                        border: '1px solid black',
-                        borderRadius: '5px'
-                    }
+
+                onChange={this.updateResponseStringAce}
+
+                editorProps={{ $blockScrolling: true }}
+                setOptions={{
+                    useWorker: false
                 }}
-                onChange={this.updateResponseString}
+                style={{
+                    border: "2px solid #f8f9fa",
+                    borderRadius: "5px",
+                    padding: "5px"
+                }}
             />
         })
 
@@ -216,15 +227,15 @@ class AddRouteForm extends React.Component {
     parseFileInput(value) {
         var pattern = new RegExp('(\.json|\.xml|\.txt)');
         if (pattern.test(value)) {
-            this.setState({ 
-                fileInputClass: "bg-success", 
+            this.setState({
+                fileInputClass: "bg-success",
                 inputMessage: ""
             });
         } else {
-            this.setState({ 
+            this.setState({
                 fileInputClass: "bg-warning",
                 inputMessage: "Please enter a filename ending in json, xml, or txt."
-             });
+            });
 
         }
     }
@@ -232,18 +243,24 @@ class AddRouteForm extends React.Component {
     changeInputType(type) {
         var rb;
         if (type === "JSON") {
-            rb = <JSONInput
-                id='add_route_editor'
-                locale={locale}
+            rb = <AceEditor
+                mode="json"
+                theme="monokai"
+                name="add_route_editor_json"
+                width="100%"
                 height='550px'
-                width='100%'
-                style={{
-                    outerBox: {
-                        border: '1px solid black',
-                        borderRadius: '5px'
-                    }
+
+                onChange={this.updateResponseStringAce}
+
+                editorProps={{ $blockScrolling: true }}
+                setOptions={{
+                    useWorker: false
                 }}
-                onChange={this.updateResponseString}
+                style={{
+                    border: "2px solid #f8f9fa",
+                    borderRadius: "5px",
+                    padding: "5px"
+                }}
             />
         } else {
             //rb = <input name="responsestringText" className="w-100" style={{ height: 550 }} />
@@ -259,6 +276,11 @@ class AddRouteForm extends React.Component {
                 editorProps={{ $blockScrolling: true }}
                 setOptions={{
                     useWorker: false
+                }}
+                style={{
+                    border: "2px solid #f8f9fa",
+                    borderRadius: "5px",
+                    padding: "5px"
                 }}
             />
         }
