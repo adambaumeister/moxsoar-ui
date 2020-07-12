@@ -4,7 +4,7 @@ import logo from '../moxsoar_logo.svg';
 import './Packs.css';
 import IntegrationDetails from './Integration';
 import { Plus, Check, ArrowClockwise, ArrowDown, X } from 'react-bootstrap-icons';
-import { GenericSubmitButton, TextInput, StatusBar } from './Core'
+import { GenericSubmitButton, TextInput, StatusBar, TransformerButton } from './Core'
 
 class InfoBox extends React.Component {
     render() {
@@ -67,15 +67,42 @@ class RunnerTable extends React.Component {
     }
 }
 
+class AddIntegrationForm extends React.Component {
+    constructor(props) {
+        super(props);
+        this.submit = this.submit.bind(this);
+    }
+
+    submit(e) {
+        e.preventDefault();
+        var data = new FormData(e.target);
+        var m = new Moxsoar();
+
+        m.AddIntegration(this.props.statuscb, this.props.packName, data.get("name"));
+    }
+
+    render() {
+        return (
+            <form onSubmit={this.submit}>
+                <TextInput displayName='Name' fieldName='name' />
+                <GenericSubmitButton text="Add" />
+            </form>
+
+        )
+    }
+}
+
 class PackDetails extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
             retrieved: false,
-            runner: {}
+            runner: {},
+            statusBar: ""
         };
         this.setDetails = this.setDetails.bind(this);
+        this.status = this.status.bind(this);
 
     }
 
@@ -83,6 +110,26 @@ class PackDetails extends React.Component {
 
         var m = new Moxsoar();
         m.GetPackDetails(this, this.props.packName);
+    }
+
+    status(result) {
+        if (result.failed) {
+            this.setState({
+                statusBar: <StatusBar
+                    type="alert alert-warning mt-4 fade show"
+                    show={true}
+                    msg={result.error}
+                />
+            })
+        } else {
+            this.setState({
+                statusBar: <StatusBar
+                    type="alert alert-success mt-4 fade show"
+                    show={true}
+                    msg={result.json["Message"]}
+                />
+            })
+        }
     }
 
     setDetails(result) {
@@ -105,6 +152,14 @@ class PackDetails extends React.Component {
                     <RunnerTable runner={this.state.runner.Runner} />
                     <h4 className="text-light ml-4">Running integrations</h4>
                     <Running packName={this.props.packName} running={this.state.runner.Running} nav={this.props.nav} />
+                    {this.state.statusBar}
+                    <TransformerButton
+                        outerClass="m-4 text-center"
+                        object={<AddIntegrationForm
+                            packName={this.props.packName}
+                            statuscb={this.status}
+                        />}
+                    />
                 </div>
             )
         }
@@ -337,7 +392,7 @@ class UpdateButton extends React.Component {
         if (result.failed) {
             this.setState({ failed: true, failMessage: result.error, loading: false });
         } else {
-            this.setState({ success: true, loading: false});
+            this.setState({ success: true, loading: false });
         }
     }
 

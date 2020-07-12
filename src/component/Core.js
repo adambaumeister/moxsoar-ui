@@ -288,6 +288,38 @@ export class GenericSubmitButton extends React.Component {
     }
 }
 
+export class TransformerButton extends React.Component {
+    /*
+    A button that turns into something else when you click it!
+    props:
+        outerClass       CSS Classes to use for outer div
+        buttonClass      CSS classes to use for button
+        object           Object to turn into        
+    */
+   constructor(props) {
+       super(props);
+
+       this.clicked = this.clicked.bind(this);
+       this.state = {
+           display: <button onClick={this.clicked} class="btn btn-primary">New</button>
+       }
+   }
+
+   clicked() {
+       this.setState({
+           display: this.props.object
+       })
+   }
+
+   render() {
+       return(
+           <div className={this.props.outerClass || ""}>
+               {this.state.display} 
+           </div>
+       )
+   }
+}
+
 class LoginForm extends React.Component {
     /*
     Good example of an API based form that uses an external class and the async fetch to work

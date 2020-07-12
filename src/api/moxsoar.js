@@ -341,6 +341,32 @@ export default class Moxsoar {
             )
     }
 
+    AddIntegration(cb, packName, name) {
+        var r = new MoxsoarResponse();
+        fetch("/api/packs/" + packName + "/" + name, {
+            method: 'POST'
+        })
+            .then(function (response) {
+                r.SetResponse(response);
+                if (!response.ok) {
+                    throw "Failed to add integration."
+                } else {
+                    return response.json()
+                }
+            })
+            .then(
+                (result) => {
+                    r.SetJson(result);
+                    cb(r);
+                },
+
+                (error) => {
+                    r.SetError(error);
+                    cb(r);
+                }
+            )
+    }
+
 }
 
 export class MoxsoarResponse {
