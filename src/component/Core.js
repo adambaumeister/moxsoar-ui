@@ -301,7 +301,7 @@ export class TransformerButton extends React.Component {
 
        this.clicked = this.clicked.bind(this);
        this.state = {
-           display: <button onClick={this.clicked} class="btn btn-primary">New</button>
+           display: <button onClick={this.clicked} className="btn btn-primary">New</button>
        }
    }
 

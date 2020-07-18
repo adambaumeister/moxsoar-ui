@@ -3,7 +3,7 @@ import Moxsoar from '../api/moxsoar';
 import logo from '../moxsoar_logo.svg';
 import './Packs.css';
 import IntegrationDetails from './Integration';
-import { Plus, Check, ArrowClockwise, ArrowDown, X } from 'react-bootstrap-icons';
+import { Plus, Check, ArrowClockwise, ArrowDown, X, TrashFill } from 'react-bootstrap-icons';
 import { GenericSubmitButton, TextInput, StatusBar, TransformerButton } from './Core'
 
 class InfoBox extends React.Component {
@@ -18,21 +18,41 @@ class Integration extends React.Component {
     constructor(props) {
         super(props);
         this.onclick = this.onclick.bind(this);
+        this.delete = this.delete.bind(this);
     }
 
     onclick() {
         this.props.nav.setRoutePage(this.props.packName, this.props.integration.Name);
     }
+
+    delete(e) {
+        e.stopPropagation();
+
+        var m = new Moxsoar();
+        m.DeleteIntegration(this.props.statuscb, this.props.packName, this.props.integration.Name)
+    }
     render() {
         return (
-            <button onClick={this.onclick} className="mb-2 btn btn-primary w-100 text-left">
-                <h4>
-                    {this.props.integration.Name}
-                </h4>
-                <h6 className="text-muted">
-                    {this.props.integration.Addr}
-                </h6>
-            </button>
+            <div onClick={this.onclick} className="mb-2 btn btn-primary w-100 text-left">
+                <div className="row">
+                    <div className="col">
+                        <h4>
+                            {this.props.integration.Name}
+                        </h4>
+                    </div>
+                    <div className="col-1 text-right">
+                        <h4>
+                            <TrashFill
+                                onClick={this.delete}
+                                color="#dc3545"
+                                className="icon"
+                                size={24}
+                            />
+                        </h4>
+                    </div>
+                </div>
+
+            </div>
         )
     }
 }
@@ -44,7 +64,13 @@ class Running extends React.Component {
         var index = 0;
 
         for (var integration of this.props.running) {
-            ints.push(<Integration packName={this.props.packName} key={index} integration={integration} nav={this.props.nav} />)
+            ints.push(<Integration
+                packName={this.props.packName}
+                key={index}
+                integration={integration}
+                nav={this.props.nav}
+                statuscb={this.props.statuscb}
+            />)
             index++;
         }
         return (
@@ -129,7 +155,11 @@ class PackDetails extends React.Component {
                     msg={result.json["Message"]}
                 />
             })
+
+            var m = new Moxsoar();
+            m.GetPackDetails(this, this.props.packName);
         }
+        
     }
 
     setDetails(result) {
@@ -151,8 +181,15 @@ class PackDetails extends React.Component {
                     <h4 className="text-light ml-4">Runner configuration</h4>
                     <RunnerTable runner={this.state.runner.Runner} />
                     <h4 className="text-light ml-4">Running integrations</h4>
-                    <Running packName={this.props.packName} running={this.state.runner.Running} nav={this.props.nav} />
-                    {this.state.statusBar}
+                    <Running
+                        packName={this.props.packName}
+                        running={this.state.runner.Running}
+                        nav={this.props.nav}
+                        statuscb={this.status}
+                    />
+                    <div className="m-4">
+                        {this.state.statusBar}
+                    </div>
                     <TransformerButton
                         outerClass="m-4 text-center"
                         object={<AddIntegrationForm

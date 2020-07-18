@@ -367,6 +367,32 @@ export default class Moxsoar {
             )
     }
 
+    DeleteIntegration(cb, packName, integrationName) {
+        var r = new MoxsoarResponse();
+        fetch("/api/packs/" + packName + "/" + integrationName, {
+            method: 'DELETE'
+        })
+            .then(function (response) {
+                r.SetResponse(response);
+                if (!response.ok) {
+                    throw "Failed to delete integration."
+                } else {
+                    return response.json()
+                }
+            })
+            .then(
+                (result) => {
+                    r.SetJson(result);
+                    cb(r);
+                },
+
+                (error) => {
+                    r.SetError(error);
+                    cb(r);
+                }
+            )
+    }
+
 }
 
 export class MoxsoarResponse {
