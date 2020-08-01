@@ -50,6 +50,7 @@ export class TextInput extends React.Component {
         fieldname (str)         : Name of input field
         displayName (str)       : Human readable name of input field
         onchange (func(input value))       : Function pointer for callback to run when field changes. 
+        placeholder (str)       : Initial or placeholder value
     */
     constructor(props) {
         super(props);
@@ -67,7 +68,15 @@ export class TextInput extends React.Component {
                 <div className="input-group-prepend w-25">
                     <span className="input-group-text w-100">{this.props.displayName || this.props.fieldName}</span>
                 </div>
-                <input onChange={this.onchange} type={this.props.type || "text"} className={"form-control " + this.props.inputclass} aria-label={this.props.displayName || this.props.fieldName} name={this.props.fieldName} aria-describedby="basic-addon1" />
+                <input 
+                    onChange={this.onchange} 
+                    type={this.props.type || "text"} 
+                    className={"form-control " + this.props.inputclass} 
+                    aria-label={this.props.displayName || this.props.fieldName} 
+                    name={this.props.fieldName} 
+                    aria-describedby="basic-addon1" 
+                    placeholder={this.props.placeholder || ""}
+                />
             </div>
         )
     }
@@ -346,7 +355,7 @@ class LoginForm extends React.Component {
         if (result.failed) {
             this.setState({ failed: true, failMessage: result.error });
         } else {
-            this.props.onlogin(result.json['Username']);
+            this.props.onlogin(result.json);
         }
     }
 
@@ -398,6 +407,13 @@ export class Container extends React.Component {
         this.setPackPage = this.setPackPage.bind(this);
         this.setRoutePage = this.setRoutePage.bind(this);
 
+        this.getSettings = this.getSettings.bind(this);
+        this.setSettings = this.setSettings.bind(this);
+
+
+        this.setRoutePage = this.setRoutePage.bind(this);
+
+
         var cookie = GetCookie('token');
         var usernameCookie = GetCookie('username');
 
@@ -412,22 +428,42 @@ export class Container extends React.Component {
             this.state = {
                 loggedIn: true,
                 page: "packs",
-                username: usernameCookie
+                username: usernameCookie,
+                settings: {}
             }
+
         } else {
             this.state = {
                 loggedIn: false,
+                settings: {}
             }
         }
 
     }
+    
+    componentDidMount() {
+        this.getSettings();
+    }
+
+    getSettings() {
+        var m = new Moxsoar();
+        m.GetSettings(this.setSettings)    
+    }
+
+    setSettings(result) {
+        if (!result.failed) {
+            this.setState({ settings: result.json });
+        }
+    }
+
 
     // We need to pass self in, as this is accessed within a callback function.
     // This is a bit weird!
-    setLoggedIn(username) {
+    setLoggedIn(jsondata) {
         this.setState({
             loggedIn: true,
-            username: username
+            username: jsondata['Username'],
+            settings: jsondata['Settings']
         })
     }
 
@@ -465,7 +501,15 @@ export class Container extends React.Component {
                             <HelpButton />
                         </div>
 
-                        <Main page={this.state.page} nav={this.nav} packName={this.state.packName} integrationName={this.state.integrationName} username={this.state.username} />
+                        <Main 
+                            page={this.state.page} 
+                            nav={this.nav} 
+                            packName={this.state.packName} 
+                            integrationName={this.state.integrationName} 
+                            username={this.state.username} 
+                            settings={this.state.settings}
+                            globalStateCallback={this.getSettings}
+                        />
                         <Footer username={this.state.username} />
                     </div>
                 </div>

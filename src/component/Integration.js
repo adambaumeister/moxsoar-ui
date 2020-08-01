@@ -113,6 +113,8 @@ class Route extends React.Component {
             methodDisplayed: false
         })
 
+        this.onPathClick = this.onPathClick.bind(this);
+
     }
 
     displayMethod() {
@@ -139,6 +141,12 @@ class Route extends React.Component {
         })
     }
 
+    onPathClick(e) {
+        e.stopPropagation();
+
+        window.open("http://" + this.props.settings.DisplayHost + ":" + this.props.port  + this.props.route.Path)
+    }
+
     render() {
         var methods = "GET";
         if (this.props.route.Methods) {
@@ -146,10 +154,10 @@ class Route extends React.Component {
         }
         return (
             <div>
-                <div onClick={this.displayMethod} data-toggle="collapse" className="mb-2 btn btn-primary w-100 text-left">
+                <div onClick={this.displayMethod} className="mb-2 btn btn-primary w-100 text-left">
                     <div className="row">
                         <div className="col">
-                            <h4>{this.props.route.Path}</h4>
+                            <h4 className="link float-left" onClick={this.onPathClick}>{this.props.route.Path}</h4>
                         </div>
                         <div className="col text-right">
                             <h4 className="text-muted">
@@ -429,9 +437,11 @@ class Routes extends React.Component {
                     rowId={index}
                     key={index}
                     route={route}
+                    port={result.json.Port}
                     packName={this.props.packName}
                     integrationName={this.props.integrationName}
                     deleteRoute={this.deleteRoute}
+                    settings={this.props.settings}
                 />);
             index++;
         }
@@ -516,6 +526,7 @@ export default class IntegrationPage extends React.Component {
             <Routes
                 packName={this.props.packName}
                 integrationName={this.props.integrationName}
+                settings={this.props.settings}
             />
         )
     }

@@ -5,3 +5,14 @@
 .checkbox {
     color: #5498ad;
 }
+
+
+.link {
+    transition: all 0.1s ease-in;
+    cursor: pointer;
+    margin-right: 2px;
+    color: black;
+  }
+  .link:hover {
+    color: white;
+  }

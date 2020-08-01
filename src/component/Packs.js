@@ -159,7 +159,7 @@ class PackDetails extends React.Component {
             var m = new Moxsoar();
             m.GetPackDetails(this, this.props.packName);
         }
-        
+
     }
 
     setDetails(result) {
@@ -463,6 +463,12 @@ class UpdateButton extends React.Component {
 
 
 class Settings extends React.Component {
+    /*
+    Settings Page
+
+    Props
+        
+    */  
     constructor(props) {
         super(props);
         this.state = {
@@ -473,13 +479,16 @@ class Settings extends React.Component {
             newPasswordRepeat: '',
             inputclass: "",
             message: "",
-            success: ""
+            success: "",
+            statusBar: <div/>
         }
         this.onPwChange = this.onPwChange.bind(this);
         this.onRepeatChange = this.onRepeatChange.bind(this);
         this.reactStringify = this.reactStringify.bind(this);
         this.addusercb = this.addusercb.bind(this);
+        this.status = this.status.bind(this);
 
+        this.changeSettings = this.changeSettings.bind(this);
     }
 
     onPwChange(pw) {
@@ -501,31 +510,82 @@ class Settings extends React.Component {
         e.preventDefault();
         var data = new FormData(e.target);
         var m = new Moxsoar();
-        console.log(this.props.username)
-        m.AddUser(this, this.props.username, data.get('password'));
+        m.AddUser(this.status, this.props.username, data.get('password'));
+    }
+
+    changeSettings(e) {
+        e.preventDefault();
+        var data = new FormData(e.target);
+        var m = new Moxsoar();
+        m.EditSettings(this.status, data);
+        this.props.globalStateCallback();
     }
 
     addusercb(result) {
         if (result.failed) {
             this.setState({ failed: true, failMessage: result.error });
         } else {
-            this.setState({ success: true, message: "Success! " });
+            this.setState({ success: true, message: "Success!" });
         }
     }
+
+    status(result) {
+        if (result.failed) {
+            this.setState({
+                statusBar: <StatusBar
+                    type="alert alert-warning mt-4 fade show"
+                    show={true}
+                    msg={result.error}
+                />
+            })
+        } else {
+            this.setState({
+                statusBar: <StatusBar
+                    type="alert alert-success mt-4 fade show"
+                    show={true}
+                    msg={result.json["Message"]}
+                />
+            })
+        }
+    }
+
+
     render() {
         return (
             <div className="m-4">
-                <h4 className="text-light mb-2">
-                    Change password
-                </h4>
-                <form onSubmit={this.reactStringify}>
-                    <TextInput onchange={this.onPwChange} fieldName='password' type='password' />
-                    <TextInput onchange={this.onRepeatChange} inputclass={this.state.inputclass} displayName="Repeat Password" fieldName='RepeatPassword' type='password' />
-                    <GenericSubmitButton />
-                    <StatusBar show={this.state.failed} type="alert alert-danger mt-4 fade show" msg={this.state.failMessage} />
-                    <StatusBar show={this.state.success} type="alert alert-success mt-4 fade show" msg={this.state.message} />
+                <div className="row">
+                    <div className="col">
+                        {this.state.statusBar}
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <h4 className="text-light mb-2 text-center">
+                            Change password
+                        </h4>
+                        <form onSubmit={this.reactStringify}>
+                            <TextInput onchange={this.onPwChange} fieldName='password' type='password' />
+                            <TextInput onchange={this.onRepeatChange} inputclass={this.state.inputclass} displayName="Repeat Password" fieldName='RepeatPassword' type='password' />
+                            <GenericSubmitButton />
+                        </form>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <h4 className="text-light mb-2 text-center">
+                            System Settings
+                        </h4>
+                        <form onSubmit={this.changeSettings}>
+                            <TextInput 
+                                fieldName='displayhost' 
+                                displayName="Moxsoar Server Name" 
+                                placeholder={this.props.settings['DisplayHost']}
+                            />
+                            <GenericSubmitButton />
+                        </form>
+                    </div>
+                </div>
 
-                </form>
             </div>
         )
     }
@@ -558,7 +618,11 @@ export class Main extends React.Component {
 
                         <img src={logo} height='50px' className="mt-4"></img>
                         <h1 className="header mt-2 text-center text-light">{this.props.packName}</h1>
-                        <IntegrationDetails packName={this.props.packName} integrationName={this.props.integrationName} />
+                        <IntegrationDetails 
+                            packName={this.props.packName} 
+                            integrationName={this.props.integrationName} 
+                            settings={this.props.settings}
+                        />
                     </div>
                 </div>
             )
@@ -570,7 +634,11 @@ export class Main extends React.Component {
 
                         <img src={logo} height='50px' className="mt-4"></img>
                         <h1 className="header mt-2 text-center text-light">Settings</h1>
-                        <Settings username={this.props.username} />
+                        <Settings 
+                            username={this.props.username} 
+                            settings={this.props.settings}
+                            globalStateCallback={this.props.globalStateCallback}
+                        />
                     </div>
                 </div>
             )
@@ -582,7 +650,9 @@ export class Main extends React.Component {
 
                         <img src={logo} height='50px' className="mt-4"></img>
                         <h1 className="header mt-2 text-center text-light">Installed Content Packs</h1>
-                        <PackList nav={this.props.nav} />
+                        <PackList 
+                            nav={this.props.nav} 
+                        />
                     </div>
                 </div>
             )

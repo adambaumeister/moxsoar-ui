@@ -204,7 +204,7 @@ export default class Moxsoar {
             )
     }
 
-    AddUser(obj, username, password) {
+    AddUser(cb, username, password) {
 
         var b = {
             "username": username,
@@ -226,14 +226,14 @@ export default class Moxsoar {
             .then(
                 (result) => {
                     r.SetJson(result);
-                    obj.addusercb(r);
+                    cb(r);
                 },
                 // Note: it's important to handle errors here
                 // instead of a catch() block so that we don't swallow
                 // exceptions from actual bugs in components.
                 (error) => {
                     r.SetError(error);
-                    obj.addusercb(r);
+                    cb(r);
                 }
             )
     }
@@ -350,6 +350,63 @@ export default class Moxsoar {
                 r.SetResponse(response);
                 if (!response.ok) {
                     throw "Failed to add integration."
+                } else {
+                    return response.json()
+                }
+            })
+            .then(
+                (result) => {
+                    r.SetJson(result);
+                    cb(r);
+                },
+
+                (error) => {
+                    r.SetError(error);
+                    cb(r);
+                }
+            )
+    }
+
+    GetSettings(cb) {
+        var r = new MoxsoarResponse();
+        fetch("/api/settings", {
+            method: 'GET'
+        })
+            .then(function (response) {
+                r.SetResponse(response);
+                if (!response.ok) {
+                    throw "Failed to retrieve system settings."
+                } else {
+                    return response.json()
+                }
+            })
+            .then(
+                (result) => {
+                    r.SetJson(result);
+                    cb(r);
+                },
+
+                (error) => {
+                    r.SetError(error);
+                    cb(r);
+                }
+            )
+    }
+
+    EditSettings(cb, settings) {
+        var r = new MoxsoarResponse();
+        var b = {
+            "DisplayHost": settings.get("displayhost")
+        }
+        console.log(b)
+        fetch("/api/settings", {
+            method: 'POST',
+            body: JSON.stringify(b)
+        })
+            .then(function (response) {
+                r.SetResponse(response);
+                if (!response.ok) {
+                    throw "Failed to update settings."
                 } else {
                     return response.json()
                 }
