@@ -18,6 +18,7 @@
     "react-json-editor-ajrm": "^2.5.9",
     "react-json-view": "^1.19.1",
     "react-scripts": "3.4.1",
+    "react-transition-group": "^1.2.1",
     "react-xml-viewer": "^1.0.3",
     "universal-cookie": "^4.0.3"
   },

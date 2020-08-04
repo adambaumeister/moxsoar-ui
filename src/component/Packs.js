@@ -3,8 +3,9 @@ import Moxsoar from '../api/moxsoar';
 import logo from '../moxsoar_logo.svg';
 import './Packs.css';
 import IntegrationDetails from './Integration';
-import { Plus, Check, ArrowClockwise, ArrowDown, X } from 'react-bootstrap-icons';
-import { GenericSubmitButton, TextInput, StatusBar } from './Core'
+import { Plus, Check, ArrowClockwise, ArrowDown, X, TrashFill, FileCheck } from 'react-bootstrap-icons';
+import { GenericSubmitButton, TextInput, StatusBar, TransformerButton, ConfirmButton } from './Core'
+import { CSSTransitionGroup } from 'react-transition-group' // ES6
 
 class InfoBox extends React.Component {
     render() {
@@ -18,21 +19,41 @@ class Integration extends React.Component {
     constructor(props) {
         super(props);
         this.onclick = this.onclick.bind(this);
+        this.delete = this.delete.bind(this);
     }
 
     onclick() {
         this.props.nav.setRoutePage(this.props.packName, this.props.integration.Name);
     }
+
+    delete(e) {
+        e.stopPropagation();
+
+        var m = new Moxsoar();
+        m.DeleteIntegration(this.props.statuscb, this.props.packName, this.props.integration.Name)
+    }
     render() {
         return (
-            <button onClick={this.onclick} className="mb-2 btn btn-primary w-100 text-left">
-                <h4>
-                    {this.props.integration.Name}
-                </h4>
-                <h6 className="text-muted">
-                    {this.props.integration.Addr}
-                </h6>
-            </button>
+            <div onClick={this.onclick} className="mb-2 btn btn-primary w-100 text-left">
+                <div className="row">
+                    <div className="col">
+                        <h4>
+                            {this.props.integration.Name}
+                        </h4>
+                    </div>
+                    <div className="col-1 text-right">
+                        <h4>
+                            <TrashFill
+                                onClick={this.delete}
+                                color="#dc3545"
+                                className="icon"
+                                size={24}
+                            />
+                        </h4>
+                    </div>
+                </div>
+
+            </div>
         )
     }
 }
@@ -44,7 +65,13 @@ class Running extends React.Component {
         var index = 0;
 
         for (var integration of this.props.running) {
-            ints.push(<Integration packName={this.props.packName} key={index} integration={integration} nav={this.props.nav} />)
+            ints.push(<Integration
+                packName={this.props.packName}
+                key={index}
+                integration={integration}
+                nav={this.props.nav}
+                statuscb={this.props.statuscb}
+            />)
             index++;
         }
         return (
@@ -67,15 +94,42 @@ class RunnerTable extends React.Component {
     }
 }
 
+class AddIntegrationForm extends React.Component {
+    constructor(props) {
+        super(props);
+        this.submit = this.submit.bind(this);
+    }
+
+    submit(e) {
+        e.preventDefault();
+        var data = new FormData(e.target);
+        var m = new Moxsoar();
+
+        m.AddIntegration(this.props.statuscb, this.props.packName, data.get("name"));
+    }
+
+    render() {
+        return (
+            <form onSubmit={this.submit}>
+                <TextInput displayName='Name' fieldName='name' />
+                <GenericSubmitButton text="Add" />
+            </form>
+
+        )
+    }
+}
+
 class PackDetails extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
             retrieved: false,
-            runner: {}
+            runner: {},
+            statusBar: ""
         };
         this.setDetails = this.setDetails.bind(this);
+        this.status = this.status.bind(this);
 
     }
 
@@ -83,6 +137,30 @@ class PackDetails extends React.Component {
 
         var m = new Moxsoar();
         m.GetPackDetails(this, this.props.packName);
+    }
+
+    status(result) {
+        if (result.failed) {
+            this.setState({
+                statusBar: <StatusBar
+                    type="alert alert-warning mt-4 fade show"
+                    show={true}
+                    msg={result.error}
+                />
+            })
+        } else {
+            this.setState({
+                statusBar: <StatusBar
+                    type="alert alert-success mt-4 fade show"
+                    show={true}
+                    msg={result.json["Message"]}
+                />
+            })
+
+            var m = new Moxsoar();
+            m.GetPackDetails(this, this.props.packName);
+        }
+
     }
 
     setDetails(result) {
@@ -104,7 +182,22 @@ class PackDetails extends React.Component {
                     <h4 className="text-light ml-4">Runner configuration</h4>
                     <RunnerTable runner={this.state.runner.Runner} />
                     <h4 className="text-light ml-4">Running integrations</h4>
-                    <Running packName={this.props.packName} running={this.state.runner.Running} nav={this.props.nav} />
+                    <Running
+                        packName={this.props.packName}
+                        running={this.state.runner.Running}
+                        nav={this.props.nav}
+                        statuscb={this.status}
+                    />
+                    <div className="m-4">
+                        {this.state.statusBar}
+                    </div>
+                    <TransformerButton
+                        outerClass="m-4 text-center"
+                        object={<AddIntegrationForm
+                            packName={this.props.packName}
+                            statuscb={this.status}
+                        />}
+                    />
                 </div>
             )
         }
@@ -337,7 +430,7 @@ class UpdateButton extends React.Component {
         if (result.failed) {
             this.setState({ failed: true, failMessage: result.error, loading: false });
         } else {
-            this.setState({ success: true, loading: false});
+            this.setState({ success: true, loading: false });
         }
     }
 
@@ -371,6 +464,9 @@ class UpdateButton extends React.Component {
 
 
 class Settings extends React.Component {
+    /*
+    Settings Page
+    */
     constructor(props) {
         super(props);
         this.state = {
@@ -381,13 +477,16 @@ class Settings extends React.Component {
             newPasswordRepeat: '',
             inputclass: "",
             message: "",
-            success: ""
+            success: "",
+            statusBar: <div />
         }
         this.onPwChange = this.onPwChange.bind(this);
         this.onRepeatChange = this.onRepeatChange.bind(this);
         this.reactStringify = this.reactStringify.bind(this);
         this.addusercb = this.addusercb.bind(this);
+        this.status = this.status.bind(this);
 
+        this.changeSettings = this.changeSettings.bind(this);
     }
 
     onPwChange(pw) {
@@ -409,46 +508,205 @@ class Settings extends React.Component {
         e.preventDefault();
         var data = new FormData(e.target);
         var m = new Moxsoar();
-        console.log(this.props.username)
-        m.AddUser(this, this.props.username, data.get('password'));
+        m.AddUser(this.status, this.props.username, data.get('password'));
+    }
+
+    changeSettings(e) {
+        e.preventDefault();
+        var data = new FormData(e.target);
+        var m = new Moxsoar();
+        m.EditSettings(this.status, data);
+        this.props.globalStateCallback();
     }
 
     addusercb(result) {
         if (result.failed) {
             this.setState({ failed: true, failMessage: result.error });
         } else {
-            this.setState({ success: true, message: "Success! " });
+            this.setState({ success: true, message: "Success!" });
         }
     }
+
+    status(result) {
+        if (result.failed) {
+            this.setState({
+                statusBar: <StatusBar
+                    type="alert alert-warning mt-4 fade show"
+                    show={true}
+                    msg={result.error}
+                />
+            })
+        } else {
+            this.setState({
+                statusBar: <StatusBar
+                    type="alert alert-success mt-4 fade show"
+                    show={true}
+                    msg={result.json["Message"]}
+                />
+            })
+        }
+    }
+
+
     render() {
         return (
             <div className="m-4">
-                <h4 className="text-light mb-2">
-                    Change password
-                </h4>
-                <form onSubmit={this.reactStringify}>
-                    <TextInput onchange={this.onPwChange} fieldName='password' type='password' />
-                    <TextInput onchange={this.onRepeatChange} inputclass={this.state.inputclass} displayName="Repeat Password" fieldName='RepeatPassword' type='password' />
-                    <GenericSubmitButton />
-                    <StatusBar show={this.state.failed} type="alert alert-danger mt-4 fade show" msg={this.state.failMessage} />
-                    <StatusBar show={this.state.success} type="alert alert-success mt-4 fade show" msg={this.state.message} />
+                <div className="row">
+                    <div className="col">
+                        {this.state.statusBar}
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <h4 className="text-light mb-2 text-center">
+                            Change password
+                        </h4>
+                        <form onSubmit={this.reactStringify}>
+                            <TextInput onchange={this.onPwChange} fieldName='password' type='password' />
+                            <TextInput onchange={this.onRepeatChange} inputclass={this.state.inputclass} displayName="Repeat Password" fieldName='RepeatPassword' type='password' />
+                            <GenericSubmitButton />
+                        </form>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <h4 className="text-light mb-2 text-center">
+                            System Settings
+                        </h4>
+                        <form onSubmit={this.changeSettings}>
+                            <TextInput
+                                fieldName='displayhost'
+                                displayName="Moxsoar Server Name"
+                                placeholder={this.props.settings['DisplayHost']}
+                            />
+                            <GenericSubmitButton />
+                        </form>
+                    </div>
+                </div>
 
-                </form>
             </div>
         )
     }
 }
 
+export class EditorControls extends React.Component {
+    /*
+    Displays controls for saving the config
+    Props
+        show (bool): True or false, controls rendering
+    */
+    constructor(props) {
+        super(props);
+
+        this.clicked = this.clicked.bind(this);
+        this.submit = this.submit.bind(this);
+        this.status = this.status.bind(this);
+        this.state = {
+            items: [
+                <div className="row no-gutters" key="1">
+                    <div className="col">
+                        <FileCheck
+                            size={24}
+                            className="icon m-2"
+                            onClick={this.clicked}
+                        />
+                    </div>
+                </div>
+
+            ]
+        }
+    }
+
+    status(result) {
+        if (result.failed) {
+            this.setState({
+                items:
+                    <StatusBar
+                        type="alert alert-warning mt-4 fade show"
+                        show={true}
+                        msg={result.error}
+                    />
+            })
+        } else {
+            this.setState({
+                items:
+                    <div className="row no-gutters" key="1">
+                        <div className="col">
+                            <FileCheck
+                                size={24}
+                                className="icon m-2"
+                                onClick={this.clicked}
+                            />
+                        </div>
+                    </div>
+            })
+        }
+    }
+
+
+    submit(e) {
+        e.preventDefault();
+        // temporary hack until we build the user admin interface
+        var dummy_author = {
+            "Name": "Moxsoar User Interface",
+            "Email": "moxsoarui@localhost",
+            "When": new Date().toISOString(),
+        }
+        var data = new FormData(e.target);
+        var message = data.get("message");
+        var m = new Moxsoar();
+        m.SavePack(this.status, this.props.show, message, dummy_author)
+    }
+    clicked() {
+        this.setState({
+            items: [
+                <form onSubmit={this.submit} key="1">
+                    <div className="row no-gutters" key="1">
+                        <div className="col">
+                            <TextInput
+                                displayName='Message'
+                                fieldName='message'
+                                outerClass="input-group"
+                                displayNameWidth="w-30"
+                            />
+                        </div>
+                        <div className="col-1">
+                            <button type="submit" className="icon-button">
+                                <ConfirmButton />
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+            ]
+        })
+    }
+
+    render() {
+        if (this.props.show) {
+            return (
+                <div>
+                    {this.state.items}
+                </div>)
+        }
+        return (
+            <div />
+        )
+    }
+}
+
 export class Main extends React.Component {
+    /*
+    Renders the content within the main container based on the page we're on
+    */
     constructor(props) {
         super(props);
     }
 
     render() {
-        //console.log(this.props.packName);
         if (this.props.page == 'pack') {
             return (
-                <div className="row h-100 justify-content-center align-items-center">
+                <div className="h-100 justify-content-center align-items-center">
 
                     <div className="card main-box">
 
@@ -459,38 +717,54 @@ export class Main extends React.Component {
                 </div>
             )
         } else if (this.props.page == 'integration') {
+            //this.props.showEditorControlsCallback(true);
+
             return (
-                <div className="row h-100 justify-content-center align-items-center">
+                <div className="h-100 justify-content-center align-items-center">
 
                     <div className="card main-box">
 
                         <img src={logo} height='50px' className="mt-4"></img>
                         <h1 className="header mt-2 text-center text-light">{this.props.packName}</h1>
-                        <IntegrationDetails packName={this.props.packName} integrationName={this.props.integrationName} />
+                        <IntegrationDetails
+                            packName={this.props.packName}
+                            integrationName={this.props.integrationName}
+                            settings={this.props.settings}
+                        />
                     </div>
                 </div>
             )
         } else if (this.props.page == 'settings') {
+            //this.props.showEditorControlsCallback(false);
+
             return (
-                <div className="row h-100 justify-content-center align-items-center">
+                <div className="h-100 justify-content-center align-items-center">
 
                     <div className="card main-box">
 
                         <img src={logo} height='50px' className="mt-4"></img>
                         <h1 className="header mt-2 text-center text-light">Settings</h1>
-                        <Settings username={this.props.username} />
+                        <Settings
+                            username={this.props.username}
+                            settings={this.props.settings}
+                            globalStateCallback={this.props.globalStateCallback}
+                        />
                     </div>
                 </div>
             )
 
         } else {
+            //this.props.showEditorControlsCallback(false);
+
             return (
                 <div className="">
                     <div className="card main-box">
 
                         <img src={logo} height='50px' className="mt-4"></img>
                         <h1 className="header mt-2 text-center text-light">Installed Content Packs</h1>
-                        <PackList nav={this.props.nav} />
+                        <PackList
+                            nav={this.props.nav}
+                        />
                     </div>
                 </div>
             )

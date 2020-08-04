@@ -3,8 +3,8 @@ import './core.css';
 import logo from '../moxsoar_logo.svg';
 import Moxsoar from '../api/moxsoar';
 import GetCookie from '../funcs/cookies';
-import { Main } from './Packs';
-import { ArrowLeft, Tools, QuestionCircle, Plus, Dash } from 'react-bootstrap-icons';
+import { Main, EditorControls } from './Packs';
+import { ArrowLeft, Tools, QuestionCircle, Plus, Dash,Check } from 'react-bootstrap-icons';
 
 
 
@@ -50,6 +50,7 @@ export class TextInput extends React.Component {
         fieldname (str)         : Name of input field
         displayName (str)       : Human readable name of input field
         onchange (func(input value))       : Function pointer for callback to run when field changes. 
+        placeholder (str)       : Initial or placeholder value
     */
     constructor(props) {
         super(props);
@@ -62,12 +63,21 @@ export class TextInput extends React.Component {
         }
     }
     render() {
+        var inputGroupClass = "input-group-prepend " + (this.props.displayNameWidth || "w-25")
         return (
-            <div className="input-group mb-3">
-                <div className="input-group-prepend w-25">
+            <div className={this.props.outerClass || "input-group mb-3"}>
+                <div className={inputGroupClass}>
                     <span className="input-group-text w-100">{this.props.displayName || this.props.fieldName}</span>
                 </div>
-                <input onChange={this.onchange} type={this.props.type || "text"} className={"form-control " + this.props.inputclass} aria-label={this.props.displayName || this.props.fieldName} name={this.props.fieldName} aria-describedby="basic-addon1" />
+                <input
+                    onChange={this.onchange}
+                    type={this.props.type || "text"}
+                    className={"form-control " + this.props.inputclass}
+                    aria-label={this.props.displayName || this.props.fieldName}
+                    name={this.props.fieldName}
+                    aria-describedby="basic-addon1"
+                    placeholder={this.props.placeholder || ""}
+                />
             </div>
         )
     }
@@ -101,6 +111,30 @@ export class TextAreaInput extends React.Component {
     }
 }
 
+
+export class ConfirmButton extends React.Component {
+    /*
+    A little tickbox that does soemthing and returns the status
+    */
+
+    constructor(props) {
+        super(props);
+        this.clicked = this.clicked.bind(this);
+    }
+
+    clicked(event) {
+    }
+
+    render() {
+        return (
+            <Check
+                className="icon m-2"
+                size={24}
+                onClick={this.clicked}
+            />
+        )
+    }
+}
 
 export class StatusBar extends React.Component {
     /*
@@ -288,6 +322,38 @@ export class GenericSubmitButton extends React.Component {
     }
 }
 
+export class TransformerButton extends React.Component {
+    /*
+    A button that turns into something else when you click it!
+    props:
+        outerClass       CSS Classes to use for outer div
+        buttonClass      CSS classes to use for button
+        object           Object to turn into        
+    */
+    constructor(props) {
+        super(props);
+
+        this.clicked = this.clicked.bind(this);
+        this.state = {
+            display: <button onClick={this.clicked} className="btn btn-primary">New</button>
+        }
+    }
+
+    clicked() {
+        this.setState({
+            display: this.props.object
+        })
+    }
+
+    render() {
+        return (
+            <div className={this.props.outerClass || ""}>
+                {this.state.display}
+            </div>
+        )
+    }
+}
+
 class LoginForm extends React.Component {
     /*
     Good example of an API based form that uses an external class and the async fetch to work
@@ -314,7 +380,7 @@ class LoginForm extends React.Component {
         if (result.failed) {
             this.setState({ failed: true, failMessage: result.error });
         } else {
-            this.props.onlogin(result.json['Username']);
+            this.props.onlogin(result.json);
         }
     }
 
@@ -359,12 +425,23 @@ class Footer extends React.Component {
 }
 
 export class Container extends React.Component {
+    /*
+    Container is the primary section (or "container") of the page
+    It has many callbacks as well as looking after the little navigation buttons using the Navigation class.
+    */
     constructor(props) {
         super(props)
         this.setLoggedIn = this.setLoggedIn.bind(this);
         this.setPage = this.setPage.bind(this);
         this.setPackPage = this.setPackPage.bind(this);
         this.setRoutePage = this.setRoutePage.bind(this);
+
+        this.getSettings = this.getSettings.bind(this);
+        this.setSettings = this.setSettings.bind(this);
+        this.showEditorControls = this.showEditorControls.bind(this);
+
+        this.setRoutePage = this.setRoutePage.bind(this);
+
 
         var cookie = GetCookie('token');
         var usernameCookie = GetCookie('username');
@@ -380,40 +457,69 @@ export class Container extends React.Component {
             this.state = {
                 loggedIn: true,
                 page: "packs",
-                username: usernameCookie
+                username: usernameCookie,
+                settings: {}
             }
+
         } else {
             this.state = {
                 loggedIn: false,
+                settings: {}
             }
         }
 
     }
 
+    componentDidMount() {
+        this.getSettings();
+    }
+
+    getSettings() {
+        var m = new Moxsoar();
+        m.GetSettings(this.setSettings)
+    }
+
+    setSettings(result) {
+        if (!result.failed) {
+            this.setState({ settings: result.json });
+        }
+    }
+
+
     // We need to pass self in, as this is accessed within a callback function.
     // This is a bit weird!
-    setLoggedIn(username) {
+    setLoggedIn(jsondata) {
         this.setState({
             loggedIn: true,
-            username: username
+            username: jsondata['Username'],
+            settings: jsondata['Settings']
         })
     }
 
     setPage(pageValue) {
-        this.setState({ page: pageValue })
+        this.setState({ page: pageValue, showEditorControls: false })
     }
 
     setRoutePage(packName, integrationName) {
-        console.log(packName);
         this.setState({
             page: "integration",
             packName: packName,
-            integrationName: integrationName
+            integrationName: integrationName,
+            showEditorControls: packName
         });
     }
 
     setPackPage(pageValue, packName) {
-        this.setState({ page: pageValue, packName: packName })
+        this.setState({ page: pageValue, packName: packName, showEditorControls: packName })
+    }
+
+    showEditorControls(v) {
+        // Display the little editor controls buttons
+        if (this.state.showEditorControls !== v) {
+            this.setState({
+                showEditorControls: v
+            })
+        }
     }
 
     render() {
@@ -427,13 +533,25 @@ export class Container extends React.Component {
             <div className="container h-100">
                 <div className="h-100 row justify-content-center align-items-center">
                     <div className="col">
-                        <div className="m-2">
+                        <div className="m-2 w-50 float-left">
                             <BackButton onclick={this.setPage} />
                             <SettingsButton onclick={this.setPage} />
                             <HelpButton />
                         </div>
-
-                        <Main page={this.state.page} nav={this.nav} packName={this.state.packName} integrationName={this.state.integrationName} username={this.state.username} />
+                        <div className="float-right">
+                            <EditorControls
+                                show={this.state.showEditorControls}
+                            />
+                        </div>
+                        <Main
+                            page={this.state.page}
+                            nav={this.nav}
+                            packName={this.state.packName}
+                            integrationName={this.state.integrationName}
+                            username={this.state.username}
+                            settings={this.state.settings}
+                            globalStateCallback={this.getSettings}
+                        />
                         <Footer username={this.state.username} />
                     </div>
                 </div>
