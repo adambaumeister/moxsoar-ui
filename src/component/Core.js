@@ -3,7 +3,7 @@ import './core.css';
 import logo from '../moxsoar_logo.svg';
 import Moxsoar from '../api/moxsoar';
 import GetCookie from '../funcs/cookies';
-import { Main } from './Packs';
+import { Main, EditorControls } from './Packs';
 import { ArrowLeft, Tools, QuestionCircle, Plus, Dash } from 'react-bootstrap-icons';
 
 
@@ -400,6 +400,10 @@ class Footer extends React.Component {
 }
 
 export class Container extends React.Component {
+    /*
+    Container is the primary section (or "container") of the page
+    It has many callbacks as well as looking after the little navigation buttons using the Navigation class.
+    */
     constructor(props) {
         super(props)
         this.setLoggedIn = this.setLoggedIn.bind(this);
@@ -409,7 +413,7 @@ export class Container extends React.Component {
 
         this.getSettings = this.getSettings.bind(this);
         this.setSettings = this.setSettings.bind(this);
-
+        this.showEditorControls = this.showEditorControls.bind(this);
 
         this.setRoutePage = this.setRoutePage.bind(this);
 
@@ -472,7 +476,6 @@ export class Container extends React.Component {
     }
 
     setRoutePage(packName, integrationName) {
-        console.log(packName);
         this.setState({
             page: "integration",
             packName: packName,
@@ -482,6 +485,15 @@ export class Container extends React.Component {
 
     setPackPage(pageValue, packName) {
         this.setState({ page: pageValue, packName: packName })
+    }
+
+    showEditorControls(v) {
+        // Display the little editor controls buttons
+        if (this.state.showEditorControls !== v) {
+            this.setState({
+                showEditorControls: v
+            })
+        }
     }
 
     render() {
@@ -495,12 +507,16 @@ export class Container extends React.Component {
             <div className="container h-100">
                 <div className="h-100 row justify-content-center align-items-center">
                     <div className="col">
-                        <div className="m-2">
+                        <div className="m-2 w-50 float-left">
                             <BackButton onclick={this.setPage} />
                             <SettingsButton onclick={this.setPage} />
                             <HelpButton />
                         </div>
-
+                        <div className="m-2 float-right">
+                            <EditorControls
+                                show={this.state.showEditorControls}
+                            />
+                        </div>
                         <Main 
                             page={this.state.page} 
                             nav={this.nav} 
@@ -509,6 +525,7 @@ export class Container extends React.Component {
                             username={this.state.username} 
                             settings={this.state.settings}
                             globalStateCallback={this.getSettings}
+                            showEditorControlsCallback={this.showEditorControls}
                         />
                         <Footer username={this.state.username} />
                     </div>

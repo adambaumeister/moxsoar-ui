@@ -3,8 +3,9 @@ import Moxsoar from '../api/moxsoar';
 import logo from '../moxsoar_logo.svg';
 import './Packs.css';
 import IntegrationDetails from './Integration';
-import { Plus, Check, ArrowClockwise, ArrowDown, X, TrashFill } from 'react-bootstrap-icons';
+import { Plus, Check, ArrowClockwise, ArrowDown, X, TrashFill, FileCheck } from 'react-bootstrap-icons';
 import { GenericSubmitButton, TextInput, StatusBar, TransformerButton } from './Core'
+import { CSSTransitionGroup } from 'react-transition-group' // ES6
 
 class InfoBox extends React.Component {
     render() {
@@ -465,10 +466,7 @@ class UpdateButton extends React.Component {
 class Settings extends React.Component {
     /*
     Settings Page
-
-    Props
-        
-    */  
+    */
     constructor(props) {
         super(props);
         this.state = {
@@ -480,7 +478,7 @@ class Settings extends React.Component {
             inputclass: "",
             message: "",
             success: "",
-            statusBar: <div/>
+            statusBar: <div />
         }
         this.onPwChange = this.onPwChange.bind(this);
         this.onRepeatChange = this.onRepeatChange.bind(this);
@@ -576,9 +574,9 @@ class Settings extends React.Component {
                             System Settings
                         </h4>
                         <form onSubmit={this.changeSettings}>
-                            <TextInput 
-                                fieldName='displayhost' 
-                                displayName="Moxsoar Server Name" 
+                            <TextInput
+                                fieldName='displayhost'
+                                displayName="Moxsoar Server Name"
                                 placeholder={this.props.settings['DisplayHost']}
                             />
                             <GenericSubmitButton />
@@ -591,16 +589,62 @@ class Settings extends React.Component {
     }
 }
 
+export class EditorControls extends React.Component {
+    /*
+    Displays controls for saving the config
+    Props
+        show (bool): True or false, controls rendering
+    */
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            inputs: []
+        }
+    }
+
+    clicked() {
+        this.setState({
+            inputs: [
+                <TextInput displayName='Commit Message' fieldName='message' />
+            ]
+        })
+    }
+
+    render() {
+        if (this.props.show) {
+            return (
+                <div>
+                    <CSSTransitionGroup
+                        transitionName="example"
+                        transitionEnterTimeout={500}
+                        transitionLeaveTimeout={300}>
+                        {this.state.inputs}
+                    </CSSTransitionGroup>
+                    <FileCheck
+                        size={24}
+                        className="icon"
+                    />
+                </div>)
+        }
+        return (
+            <div />
+        )
+    }
+}
+
 export class Main extends React.Component {
+    /*
+    Renders the content within the main container based on the page we're on
+    */
     constructor(props) {
         super(props);
     }
 
     render() {
-        //console.log(this.props.packName);
         if (this.props.page == 'pack') {
             return (
-                <div className="row h-100 justify-content-center align-items-center">
+                <div className="h-100 justify-content-center align-items-center">
 
                     <div className="card main-box">
 
@@ -611,31 +655,35 @@ export class Main extends React.Component {
                 </div>
             )
         } else if (this.props.page == 'integration') {
+            //this.props.showEditorControlsCallback(true);
+
             return (
-                <div className="row h-100 justify-content-center align-items-center">
+                <div className="h-100 justify-content-center align-items-center">
 
                     <div className="card main-box">
 
                         <img src={logo} height='50px' className="mt-4"></img>
                         <h1 className="header mt-2 text-center text-light">{this.props.packName}</h1>
-                        <IntegrationDetails 
-                            packName={this.props.packName} 
-                            integrationName={this.props.integrationName} 
+                        <IntegrationDetails
+                            packName={this.props.packName}
+                            integrationName={this.props.integrationName}
                             settings={this.props.settings}
                         />
                     </div>
                 </div>
             )
         } else if (this.props.page == 'settings') {
+            //this.props.showEditorControlsCallback(false);
+
             return (
-                <div className="row h-100 justify-content-center align-items-center">
+                <div className="h-100 justify-content-center align-items-center">
 
                     <div className="card main-box">
 
                         <img src={logo} height='50px' className="mt-4"></img>
                         <h1 className="header mt-2 text-center text-light">Settings</h1>
-                        <Settings 
-                            username={this.props.username} 
+                        <Settings
+                            username={this.props.username}
                             settings={this.props.settings}
                             globalStateCallback={this.props.globalStateCallback}
                         />
@@ -644,14 +692,16 @@ export class Main extends React.Component {
             )
 
         } else {
+            //this.props.showEditorControlsCallback(false);
+
             return (
                 <div className="">
                     <div className="card main-box">
 
                         <img src={logo} height='50px' className="mt-4"></img>
                         <h1 className="header mt-2 text-center text-light">Installed Content Packs</h1>
-                        <PackList 
-                            nav={this.props.nav} 
+                        <PackList
+                            nav={this.props.nav}
                         />
                     </div>
                 </div>
