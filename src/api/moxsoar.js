@@ -185,7 +185,7 @@ export default class Moxsoar {
             .then(function (response) {
                 r.SetResponse(response);
                 if (!response.ok) {
-                    throw "Failed to clone the repository."
+                    throw "Failed to save (commit) the changes."
                 } else {
                     return response.json()
                 }

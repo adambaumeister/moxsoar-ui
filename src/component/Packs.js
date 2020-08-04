@@ -4,7 +4,7 @@ import logo from '../moxsoar_logo.svg';
 import './Packs.css';
 import IntegrationDetails from './Integration';
 import { Plus, Check, ArrowClockwise, ArrowDown, X, TrashFill, FileCheck } from 'react-bootstrap-icons';
-import { GenericSubmitButton, TextInput, StatusBar, TransformerButton } from './Core'
+import { GenericSubmitButton, TextInput, StatusBar, TransformerButton, ConfirmButton } from './Core'
 import { CSSTransitionGroup } from 'react-transition-group' // ES6
 
 class InfoBox extends React.Component {
@@ -598,15 +598,86 @@ export class EditorControls extends React.Component {
     constructor(props) {
         super(props);
 
+        this.clicked = this.clicked.bind(this);
+        this.submit = this.submit.bind(this);
+        this.status = this.status.bind(this);
         this.state = {
-            inputs: []
+            items: [
+                <div className="row no-gutters" key="1">
+                    <div className="col">
+                        <FileCheck
+                            size={24}
+                            className="icon m-2"
+                            onClick={this.clicked}
+                        />
+                    </div>
+                </div>
+
+            ]
         }
     }
 
+    status(result) {
+        if (result.failed) {
+            this.setState({
+                items:
+                    <StatusBar
+                        type="alert alert-warning mt-4 fade show"
+                        show={true}
+                        msg={result.error}
+                    />
+            })
+        } else {
+            this.setState({
+                items:
+                    <div className="row no-gutters" key="1">
+                        <div className="col">
+                            <FileCheck
+                                size={24}
+                                className="icon m-2"
+                                onClick={this.clicked}
+                            />
+                        </div>
+                    </div>
+            })
+        }
+    }
+
+
+    submit(e) {
+        e.preventDefault();
+        // temporary hack until we build the user admin interface
+        var dummy_author = {
+            "Name": "Moxsoar User Interface",
+            "Email": "moxsoarui@localhost",
+            "When": new Date().toISOString(),
+        }
+        var data = new FormData(e.target);
+        var message = data.get("message");
+        var m = new Moxsoar();
+        m.SavePack(this.status, this.props.show, message, dummy_author)
+    }
     clicked() {
         this.setState({
-            inputs: [
-                <TextInput displayName='Commit Message' fieldName='message' />
+            items: [
+                <form onSubmit={this.submit} key="1">
+                    <div className="row no-gutters" key="1">
+                        <div className="col">
+                            <TextInput
+                                displayName='Message'
+                                fieldName='message'
+                                outerClass="input-group"
+                                displayNameWidth="w-30"
+                            />
+                        </div>
+                        <div className="col-1">
+                            <button type="submit" className="icon-button">
+                                <ConfirmButton />
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
             ]
         })
     }
@@ -615,16 +686,7 @@ export class EditorControls extends React.Component {
         if (this.props.show) {
             return (
                 <div>
-                    <CSSTransitionGroup
-                        transitionName="example"
-                        transitionEnterTimeout={500}
-                        transitionLeaveTimeout={300}>
-                        {this.state.inputs}
-                    </CSSTransitionGroup>
-                    <FileCheck
-                        size={24}
-                        className="icon"
-                    />
+                    {this.state.items}
                 </div>)
         }
         return (

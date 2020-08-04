@@ -6,6 +6,11 @@
     color: #5498ad;
 }
 
+.icon-button {
+    background: none;
+    padding: 0px;
+    border: none;
+}
 
 .link {
     transition: all 0.1s ease-in;
@@ -13,6 +18,8 @@
     margin-right: 2px;
     color: black;
   }
-  .link:hover {
+
+.link:hover {
     color: white;
-  }
+}
+

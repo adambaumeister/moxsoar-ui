@@ -4,7 +4,7 @@ import logo from '../moxsoar_logo.svg';
 import Moxsoar from '../api/moxsoar';
 import GetCookie from '../funcs/cookies';
 import { Main, EditorControls } from './Packs';
-import { ArrowLeft, Tools, QuestionCircle, Plus, Dash } from 'react-bootstrap-icons';
+import { ArrowLeft, Tools, QuestionCircle, Plus, Dash,Check } from 'react-bootstrap-icons';
 
 
 
@@ -63,18 +63,19 @@ export class TextInput extends React.Component {
         }
     }
     render() {
+        var inputGroupClass = "input-group-prepend " + (this.props.displayNameWidth || "w-25")
         return (
-            <div className="input-group mb-3">
-                <div className="input-group-prepend w-25">
+            <div className={this.props.outerClass || "input-group mb-3"}>
+                <div className={inputGroupClass}>
                     <span className="input-group-text w-100">{this.props.displayName || this.props.fieldName}</span>
                 </div>
-                <input 
-                    onChange={this.onchange} 
-                    type={this.props.type || "text"} 
-                    className={"form-control " + this.props.inputclass} 
-                    aria-label={this.props.displayName || this.props.fieldName} 
-                    name={this.props.fieldName} 
-                    aria-describedby="basic-addon1" 
+                <input
+                    onChange={this.onchange}
+                    type={this.props.type || "text"}
+                    className={"form-control " + this.props.inputclass}
+                    aria-label={this.props.displayName || this.props.fieldName}
+                    name={this.props.fieldName}
+                    aria-describedby="basic-addon1"
                     placeholder={this.props.placeholder || ""}
                 />
             </div>
@@ -110,6 +111,30 @@ export class TextAreaInput extends React.Component {
     }
 }
 
+
+export class ConfirmButton extends React.Component {
+    /*
+    A little tickbox that does soemthing and returns the status
+    */
+
+    constructor(props) {
+        super(props);
+        this.clicked = this.clicked.bind(this);
+    }
+
+    clicked(event) {
+    }
+
+    render() {
+        return (
+            <Check
+                className="icon m-2"
+                size={24}
+                onClick={this.clicked}
+            />
+        )
+    }
+}
 
 export class StatusBar extends React.Component {
     /*
@@ -305,28 +330,28 @@ export class TransformerButton extends React.Component {
         buttonClass      CSS classes to use for button
         object           Object to turn into        
     */
-   constructor(props) {
-       super(props);
+    constructor(props) {
+        super(props);
 
-       this.clicked = this.clicked.bind(this);
-       this.state = {
-           display: <button onClick={this.clicked} className="btn btn-primary">New</button>
-       }
-   }
+        this.clicked = this.clicked.bind(this);
+        this.state = {
+            display: <button onClick={this.clicked} className="btn btn-primary">New</button>
+        }
+    }
 
-   clicked() {
-       this.setState({
-           display: this.props.object
-       })
-   }
+    clicked() {
+        this.setState({
+            display: this.props.object
+        })
+    }
 
-   render() {
-       return(
-           <div className={this.props.outerClass || ""}>
-               {this.state.display} 
-           </div>
-       )
-   }
+    render() {
+        return (
+            <div className={this.props.outerClass || ""}>
+                {this.state.display}
+            </div>
+        )
+    }
 }
 
 class LoginForm extends React.Component {
@@ -444,14 +469,14 @@ export class Container extends React.Component {
         }
 
     }
-    
+
     componentDidMount() {
         this.getSettings();
     }
 
     getSettings() {
         var m = new Moxsoar();
-        m.GetSettings(this.setSettings)    
+        m.GetSettings(this.setSettings)
     }
 
     setSettings(result) {
@@ -472,19 +497,20 @@ export class Container extends React.Component {
     }
 
     setPage(pageValue) {
-        this.setState({ page: pageValue })
+        this.setState({ page: pageValue, showEditorControls: false })
     }
 
     setRoutePage(packName, integrationName) {
         this.setState({
             page: "integration",
             packName: packName,
-            integrationName: integrationName
+            integrationName: integrationName,
+            showEditorControls: packName
         });
     }
 
     setPackPage(pageValue, packName) {
-        this.setState({ page: pageValue, packName: packName })
+        this.setState({ page: pageValue, packName: packName, showEditorControls: packName })
     }
 
     showEditorControls(v) {
@@ -512,20 +538,19 @@ export class Container extends React.Component {
                             <SettingsButton onclick={this.setPage} />
                             <HelpButton />
                         </div>
-                        <div className="m-2 float-right">
+                        <div className="float-right">
                             <EditorControls
                                 show={this.state.showEditorControls}
                             />
                         </div>
-                        <Main 
-                            page={this.state.page} 
-                            nav={this.nav} 
-                            packName={this.state.packName} 
-                            integrationName={this.state.integrationName} 
-                            username={this.state.username} 
+                        <Main
+                            page={this.state.page}
+                            nav={this.nav}
+                            packName={this.state.packName}
+                            integrationName={this.state.integrationName}
+                            username={this.state.username}
                             settings={this.state.settings}
                             globalStateCallback={this.getSettings}
-                            showEditorControlsCallback={this.showEditorControls}
                         />
                         <Footer username={this.state.username} />
                     </div>
