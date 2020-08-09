@@ -428,12 +428,41 @@ export default class Moxsoar {
             )
     }
 
+    TestSettings(cb) {
+        var r = new MoxsoarResponse();
+        fetch("/api/settings/test", {
+            method: 'GET'
+        })
+            .then(function (response) {
+                r.SetResponse(response);
+                if (!response.ok) {
+                    throw "Failed to retrieve system settings."
+                } else {
+                    return response.json()
+                }
+            })
+            .then(
+                (result) => {
+                    r.SetJson(result);
+                    cb(r);
+                },
+
+                (error) => {
+                    r.SetError(error);
+                    cb(r);
+                }
+            )
+    }
+
     EditSettings(cb, settings) {
         var r = new MoxsoarResponse();
         var b = {
-            "DisplayHost": settings.get("displayhost")
+            "DisplayHost": settings.get("displayhost"),
+            "Address": settings.get("address"),
+            "Username": settings.get("username"),
+            "Password": settings.get("password"),
+
         }
-        console.log(b)
         fetch("/api/settings", {
             method: 'POST',
             body: JSON.stringify(b)

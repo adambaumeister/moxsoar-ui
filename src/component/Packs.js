@@ -1,6 +1,8 @@
 import React from 'react';
 import Moxsoar from '../api/moxsoar';
 import logo from '../moxsoar_logo.svg';
+import eslogo from '../logo-elastic.svg';
+
 import './Packs.css';
 import IntegrationDetails from './Integration';
 import { Plus, Check, ArrowClockwise, ArrowDown, X, TrashFill, FileCheck } from 'react-bootstrap-icons';
@@ -568,21 +570,66 @@ class Settings extends React.Component {
                         </form>
                     </div>
                 </div>
-                <div className="row">
-                    <div className="col">
-                        <h4 className="text-light mb-2 text-center">
-                            System Settings
-                        </h4>
-                        <form onSubmit={this.changeSettings}>
+                <form onSubmit={this.changeSettings}>
+
+                    <div className="row">
+                        <div className="col">
+                            <h4 className="text-light mb-2 text-center">
+                                System Settings
+                            </h4>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col">
                             <TextInput
                                 fieldName='displayhost'
                                 displayName="Moxsoar Server Name"
-                                placeholder={this.props.settings['DisplayHost']}
+                                initialValue={this.props.settings['DisplayHost']}
                             />
-                            <GenericSubmitButton />
-                        </form>
+                        </div>
                     </div>
-                </div>
+                    <div className="row">
+                        <div className="col text-center m-4">
+                            <img src={eslogo} height='40px' className=""></img>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col">
+                            <TextInput
+                                fieldName='address'
+                                displayName="Elasticsearch Address"
+                                displayNameWidth="w-40"
+
+                                initialValue={this.props.settings['Address']}
+                            />
+                        </div>
+
+                    </div>
+                    <div className="row">
+                        <div className="col">
+                            <TextInput
+                                fieldName='username'
+                                displayName="Elasticsearch Username"
+                                displayNameWidth="w-40"
+                                initialValue={this.props.settings['Username']}
+                            />
+                        </div>
+                        <div className="col">
+                            <TextInput
+                                fieldName='password'
+                                displayNameWidth="w-40"
+                                displayName="Elasticsearch Password"
+                                initialValue={this.props.settings['Password']}
+                            />
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col">
+                            <GenericSubmitButton />
+                        </div>
+                    </div>
+                </form>
+
 
             </div>
         )
