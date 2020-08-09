@@ -577,11 +577,20 @@ class Settings extends React.Component {
                             <h4 className="text-light mb-2 text-center">
                                 System Settings
                             </h4>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col">
                             <TextInput
                                 fieldName='displayhost'
                                 displayName="Moxsoar Server Name"
-                                placeholder={this.props.settings['DisplayHost']}
+                                initialValue={this.props.settings['DisplayHost']}
                             />
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col text-center m-4">
+                            <img src={eslogo} height='40px' className=""></img>
                         </div>
                     </div>
                     <div className="row">
@@ -589,11 +598,29 @@ class Settings extends React.Component {
                             <TextInput
                                 fieldName='address'
                                 displayName="Elasticsearch Address"
-                                placeholder={this.props.settings['Address']}
+                                displayNameWidth="w-40"
+
+                                initialValue={this.props.settings['Address']}
                             />
                         </div>
-                        <div className="col-3">
-                            <img src={eslogo} height='40px' className=""></img>
+
+                    </div>
+                    <div className="row">
+                        <div className="col">
+                            <TextInput
+                                fieldName='username'
+                                displayName="Elasticsearch Username"
+                                displayNameWidth="w-40"
+                                initialValue={this.props.settings['Username']}
+                            />
+                        </div>
+                        <div className="col">
+                            <TextInput
+                                fieldName='password'
+                                displayNameWidth="w-40"
+                                displayName="Elasticsearch Password"
+                                initialValue={this.props.settings['Password']}
+                            />
                         </div>
                     </div>
                     <div className="row">

@@ -458,9 +458,11 @@ export default class Moxsoar {
         var r = new MoxsoarResponse();
         var b = {
             "DisplayHost": settings.get("displayhost"),
-            "Address": settings.get("address")
+            "Address": settings.get("address"),
+            "Username": settings.get("username"),
+            "Password": settings.get("password"),
+
         }
-        console.log(b)
         fetch("/api/settings", {
             method: 'POST',
             body: JSON.stringify(b)

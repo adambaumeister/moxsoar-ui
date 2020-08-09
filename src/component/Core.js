@@ -57,9 +57,14 @@ export class TextInput extends React.Component {
     constructor(props) {
         super(props);
         this.onchange = this.onchange.bind(this);
+        this.state = {
+            text: this.props.initialValue
+        }
     }
 
     onchange(event) {
+        this.setState({ text: event.target.value })
+
         if (this.props.onchange) {
             this.props.onchange(event.target.value);
         }
@@ -79,6 +84,7 @@ export class TextInput extends React.Component {
                     name={this.props.fieldName}
                     aria-describedby="basic-addon1"
                     placeholder={this.props.placeholder || ""}
+                    value={this.state.text}
                 />
             </div>
         )
