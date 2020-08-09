@@ -2,6 +2,7 @@
 
 $theme-colors: (
     "primary": #d1dfe9,
-    "secondary": rgba(193, 193, 193, 0.34)
+    "secondary": rgba(193, 193, 193, 0.34),
+    "success": #76fb94
 );
 @import "node_modules/bootstrap/scss/bootstrap";

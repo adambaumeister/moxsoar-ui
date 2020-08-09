@@ -1,6 +1,8 @@
 import React from 'react';
 import Moxsoar from '../api/moxsoar';
 import logo from '../moxsoar_logo.svg';
+import eslogo from '../logo-elastic.svg';
+
 import './Packs.css';
 import IntegrationDetails from './Integration';
 import { Plus, Check, ArrowClockwise, ArrowDown, X, TrashFill, FileCheck } from 'react-bootstrap-icons';
@@ -568,21 +570,39 @@ class Settings extends React.Component {
                         </form>
                     </div>
                 </div>
-                <div className="row">
-                    <div className="col">
-                        <h4 className="text-light mb-2 text-center">
-                            System Settings
-                        </h4>
-                        <form onSubmit={this.changeSettings}>
+                <form onSubmit={this.changeSettings}>
+
+                    <div className="row">
+                        <div className="col">
+                            <h4 className="text-light mb-2 text-center">
+                                System Settings
+                            </h4>
                             <TextInput
                                 fieldName='displayhost'
                                 displayName="Moxsoar Server Name"
                                 placeholder={this.props.settings['DisplayHost']}
                             />
-                            <GenericSubmitButton />
-                        </form>
+                        </div>
                     </div>
-                </div>
+                    <div className="row">
+                        <div className="col">
+                            <TextInput
+                                fieldName='address'
+                                displayName="Elasticsearch Address"
+                                placeholder={this.props.settings['Address']}
+                            />
+                        </div>
+                        <div className="col-3">
+                            <img src={eslogo} height='40px' className=""></img>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col">
+                            <GenericSubmitButton />
+                        </div>
+                    </div>
+                </form>
+
 
             </div>
         )

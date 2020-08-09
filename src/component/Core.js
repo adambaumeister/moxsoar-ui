@@ -2,9 +2,10 @@ import React from 'react';
 import './core.css';
 import logo from '../moxsoar_logo.svg';
 import Moxsoar from '../api/moxsoar';
+import { ElasticSearchStatusSimple, ElasticSearch } from '../api/Tracker'
 import GetCookie from '../funcs/cookies';
 import { Main, EditorControls } from './Packs';
-import { ArrowLeft, Tools, QuestionCircle, Plus, Dash,Check } from 'react-bootstrap-icons';
+import { ArrowLeft, Tools, QuestionCircle, Plus, Dash, Check } from 'react-bootstrap-icons';
 
 
 
@@ -51,6 +52,7 @@ export class TextInput extends React.Component {
         displayName (str)       : Human readable name of input field
         onchange (func(input value))       : Function pointer for callback to run when field changes. 
         placeholder (str)       : Initial or placeholder value
+        value (str)             : 
     */
     constructor(props) {
         super(props);
@@ -439,9 +441,9 @@ export class Container extends React.Component {
         this.getSettings = this.getSettings.bind(this);
         this.setSettings = this.setSettings.bind(this);
         this.showEditorControls = this.showEditorControls.bind(this);
+        this.setEsSettings = this.setEsSettings.bind(this);
 
         this.setRoutePage = this.setRoutePage.bind(this);
-
 
         var cookie = GetCookie('token');
         var usernameCookie = GetCookie('username');
@@ -450,21 +452,22 @@ export class Container extends React.Component {
         navigation.setRoutePage = this.setRoutePage;
         navigation.setPackPage = this.setPackPage;
         navigation.setPage = this.setPage;
-
         this.nav = navigation;
+
+        this.elasticsearch = new ElasticSearch();
 
         if (cookie) {
             this.state = {
                 loggedIn: true,
                 page: "packs",
                 username: usernameCookie,
-                settings: {}
+                settings: {},
             }
 
         } else {
             this.state = {
                 loggedIn: false,
-                settings: {}
+                settings: {},
             }
         }
 
@@ -475,15 +478,43 @@ export class Container extends React.Component {
     }
 
     getSettings() {
-        var m = new Moxsoar();
-        m.GetSettings(this.setSettings)
+        if (this.state.loggedIn) {
+            var m = new Moxsoar();
+            m.GetSettings(this.setSettings);
+            this.elasticsearch.GetStatus(this.setEsSettings);
+        }
     }
 
     setSettings(result) {
         if (!result.failed) {
-            this.setState({ settings: result.json });
+            this.setState({
+                settings: result.json,
+            });
         }
     }
+
+    setEsSettings(result) {
+        if (result.failed) {
+            this.setState({
+                elasticSearchError: "moxosar API failure.",
+                elasticSearchStatus: false
+            })
+        } else {
+            var r = result.json;
+            if (r['Connected']) {
+                this.setState({
+                    elasticSearchError: "",
+                    elasticSearchStatus: true
+                })
+            } else {
+                this.setState({
+                    elasticSearchError: r['Message'],
+                    elasticSearchStatus: false
+                })
+            }
+        }
+    }
+
 
 
     // We need to pass self in, as this is accessed within a callback function.
@@ -494,6 +525,7 @@ export class Container extends React.Component {
             username: jsondata['Username'],
             settings: jsondata['Settings']
         })
+        this.getSettings();
     }
 
     setPage(pageValue) {
@@ -523,7 +555,6 @@ export class Container extends React.Component {
     }
 
     render() {
-
         var userNotLoggedIn =
             <div className="container h-100">
                 <LoginBox onlogin={this.setLoggedIn} />
@@ -537,6 +568,10 @@ export class Container extends React.Component {
                             <BackButton onclick={this.setPage} />
                             <SettingsButton onclick={this.setPage} />
                             <HelpButton />
+                            <ElasticSearchStatusSimple
+                                status={this.state.elasticSearchStatus}
+                            />
+
                         </div>
                         <div className="float-right">
                             <EditorControls
