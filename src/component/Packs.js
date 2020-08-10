@@ -517,8 +517,7 @@ class Settings extends React.Component {
         e.preventDefault();
         var data = new FormData(e.target);
         var m = new Moxsoar();
-        m.EditSettings(this.status, data);
-        this.props.globalStateCallback();
+        m.EditSettings(this.status, data);        
     }
 
     addusercb(result) {
@@ -546,6 +545,7 @@ class Settings extends React.Component {
                     msg={result.json["Message"]}
                 />
             })
+            this.props.globalStateCallback();
         }
     }
 
