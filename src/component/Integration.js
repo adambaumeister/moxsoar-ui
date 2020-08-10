@@ -7,6 +7,7 @@ import { RadioButtons, TextInput, TextAreaInput, StatusBar, SelectInput, ToggleB
 
 import AceEditor from 'react-ace';
 import "ace-builds/src-noconflict/mode-xml";
+import "ace-builds/src-noconflict/mode-html";
 import "ace-builds/src-noconflict/mode-json";
 
 import "ace-builds/src-noconflict/theme-github";
@@ -34,30 +35,78 @@ class Method extends React.Component {
 
             var j = JSON.parse(this.props.method.ResponseString);
 
-            output = <div className="col m-3">
-                <JSONInput
-                    locale={locale}
+            output = <div className="col">
+                <AceEditor
+                    mode="json"
+                    theme="monokai"
+                    name="view_xml"
+                    width="100%"
                     height='550px'
-                    width='100%'
-                    placeholder={j}
-                    viewOnly='true'
-                    style={{
-                        outerBox: {
-                            border: '1px solid black',
-                            borderRadius: '5px'
-                        }
-                    }}
+                    readOnly={true}
 
+
+                    value={this.props.method.ResponseString}
+
+                    editorProps={{ $blockScrolling: true }}
+                    setOptions={{
+                        useWorker: false
+                    }}
+                    style={{
+                        border: "2px solid #f8f9fa",
+                        borderRadius: "5px",
+                        padding: "5px"
+                    }}
                 />
             </div>
         } else if (res == "xml") {
-            output = <div className="colmw-100 p-3 m-3">
-                <XMLViewer xml={this.props.method.ResponseString} />
+            output = <div className="col">
+                <AceEditor
+                    mode="xml"
+                    theme="github"
+                    name="view_xml"
+                    width="100%"
+                    height='550px'
+                    readOnly={true}
+
+
+                    value={this.props.method.ResponseString}
+
+                    editorProps={{ $blockScrolling: true }}
+                    setOptions={{
+                        useWorker: false
+                    }}
+                    style={{
+                        border: "2px solid #f8f9fa",
+                        borderRadius: "5px",
+                        padding: "5px"
+                    }}
+                />
             </div>
         } else {
-            output = <div className="colmw-100 p-3 m-3">
-                {this.props.method.ResponseString}
-            </div>
+            output =
+                <div className="col">
+                    <AceEditor
+                        mode="html"
+                        theme="github"
+                        name="view_html"
+                        width="100%"
+                        height='550px'
+                        readOnly={true}
+
+
+                        value={this.props.method.ResponseString}
+
+                        editorProps={{ $blockScrolling: true }}
+                        setOptions={{
+                            useWorker: false
+                        }}
+                        style={{
+                            border: "2px solid #f8f9fa",
+                            borderRadius: "5px",
+                            padding: "5px"
+                        }}
+                    />
+                </div>
         }
         return (
             <div>
@@ -144,7 +193,7 @@ class Route extends React.Component {
     onPathClick(e) {
         e.stopPropagation();
 
-        window.open("http://" + this.props.settings.DisplayHost + ":" + this.props.port  + this.props.route.Path)
+        window.open("http://" + this.props.settings.DisplayHost + ":" + this.props.port + this.props.route.Path)
     }
 
     render() {
@@ -233,7 +282,7 @@ class AddRouteForm extends React.Component {
     }
 
     parseFileInput(value) {
-        var pattern = new RegExp('(\.json|\.xml|\.txt)');
+        var pattern = new RegExp('(\.json|\.xml|\.txt|\.html)');
         if (pattern.test(value)) {
             this.setState({
                 fileInputClass: "bg-success",
@@ -242,7 +291,7 @@ class AddRouteForm extends React.Component {
         } else {
             this.setState({
                 fileInputClass: "bg-warning",
-                inputMessage: "Please enter a filename ending in json, xml, or txt."
+                inputMessage: "Please enter a filename ending in json, xml, or html."
             });
 
         }
@@ -255,6 +304,26 @@ class AddRouteForm extends React.Component {
                 mode="json"
                 theme="monokai"
                 name="add_route_editor_json"
+                width="100%"
+                height='550px'
+
+                onChange={this.updateResponseStringAce}
+
+                editorProps={{ $blockScrolling: true }}
+                setOptions={{
+                    useWorker: false
+                }}
+                style={{
+                    border: "2px solid #f8f9fa",
+                    borderRadius: "5px",
+                    padding: "5px"
+                }}
+            />
+        } else if (type === "HTML") {
+            rb = <AceEditor
+                mode="html"
+                theme="github"
+                name="add_route_editor_xml"
                 width="100%"
                 height='550px'
 
@@ -345,7 +414,8 @@ class AddRouteForm extends React.Component {
 
         const types = [
             "JSON",
-            "XML"
+            "XML",
+            "HTML"
         ]
 
         return (
