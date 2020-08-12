@@ -108,6 +108,17 @@ class Method extends React.Component {
                     />
                 </div>
         }
+        var regexRow;
+        if (this.props.method.MatchRegex) {
+            regexRow = <div className="row">
+                <div className="col">
+                    <h5 className="text-warning">{this.props.method.MatchRegex}</h5>
+                </div>
+            </div>
+        } else { 
+            regexRow = ""
+        }
+
         return (
             <div>
                 <div className="row">
@@ -121,8 +132,8 @@ class Method extends React.Component {
                             {this.props.method.ResponseCode}
                         </h5>
                     </div>
-
                 </div>
+                { regexRow }
                 <div className="row">
                     {output}
                 </div>
