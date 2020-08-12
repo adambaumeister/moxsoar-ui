@@ -306,16 +306,23 @@ export default class Moxsoar {
     }
 
     AddRoute(cb, packName, integrationName, route) {
+
+        var method = {
+            "HttpMethod": route.method,
+            "ResponseFile": route.filename,
+            "ResponseCode": route.responsecode,
+            "ResponseString": route.responsestring,
+        }
+
+        if (route.matchregex) {
+            method["MatchRegex"] = route.matchregex
+        }
+        console.log(method)
         var b = {
             "Route": {
                 "Path": route.path,
                 "Methods": [
-                    {
-                        "HttpMethod": route.method,
-                        "ResponseFile": route.filename,
-                        "ResponseCode": route.responsecode,
-                        "ResponseString": route.responsestring
-                    }
+                        method
                 ]
             }
         }

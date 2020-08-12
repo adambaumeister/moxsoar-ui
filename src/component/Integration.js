@@ -382,7 +382,7 @@ class AddRouteForm extends React.Component {
         r.filename = data.get("filename");
         r.method = data.get("method");
         r.responsestring = data.get("responsestring");
-
+        r.matchregex = data.get("matchregex")
         m.AddRoute(this.props.statuscb, this.props.packName, this.props.integrationName, r);
 
     }
@@ -455,6 +455,11 @@ class AddRouteForm extends React.Component {
                         {this.state.responseInput}
                     </div>
                     <input type="hidden" name="responsestring" value={this.state.responsestring} />
+                </div>
+                <div className="row">
+                    <div className="col text-center">
+                        <TextInput displayName="Regex Match (optional)" fieldName="matchregex" />
+                    </div>
                 </div>
                 <div className="row mb-2">
                     <div className="col text-center">
