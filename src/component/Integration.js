@@ -107,7 +107,7 @@ class Method extends React.Component {
                     <h5 className="text-warning">{this.props.method.MatchRegex}</h5>
                 </div>
             </div>
-        } else { 
+        } else {
             regexRow = ""
         }
 
@@ -125,7 +125,7 @@ class Method extends React.Component {
                         </h5>
                     </div>
                 </div>
-                { regexRow }
+                {regexRow}
                 <div className="row">
                     {output}
                 </div>
