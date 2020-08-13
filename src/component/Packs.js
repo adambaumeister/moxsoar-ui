@@ -464,6 +464,82 @@ class UpdateButton extends React.Component {
 
 }
 
+class AddVariableForm extends React.Component {
+    constructor(props) {
+        super(props);
+        this.submit = this.submit.bind(this);
+    }
+
+    submit(e) {
+        e.preventDefault();
+        // Moxsoar query to add varialbe goes here...
+        var m = new Moxsoar();
+        var data = new FormData(e.target);
+        m.AddVariable(this.props.callback, data.get("key"), data.get("value"));
+
+    }
+
+    render() {
+        return (
+            <form onSubmit={this.submit}>
+                <div className="row">
+                    <div className="col">
+                        <TextInput displayName='Variable Key' fieldName='key' />
+                    </div>
+                    <div className="col">
+                        <TextInput displayName='Variable Value' fieldName='value' />
+
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <GenericSubmitButton text="Add" />
+                    </div>
+                </div>
+            </form>
+        )
+    }
+}
+
+class Variables extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        var rows = [];
+        var variables = this.props.settings['Variables']
+
+        Object.keys(variables).map(function (k, v) {
+
+            rows.push(
+                <TextInput
+                    key={k}
+                    fieldName={k}
+                    placeholder={variables[k]}
+                />
+            )
+        })
+
+        return (
+            <div>
+                <div className="row">
+                    <div className="col">{rows}</div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <TransformerButton
+                            outerClass="text-center"
+                            object={<AddVariableForm
+                                callback={this.props.callback}
+                            />}
+                        /></div>
+                </div>
+            </div>
+
+        )
+    }
+}
 
 class Settings extends React.Component {
     /*
@@ -517,7 +593,7 @@ class Settings extends React.Component {
         e.preventDefault();
         var data = new FormData(e.target);
         var m = new Moxsoar();
-        m.EditSettings(this.status, data);        
+        m.EditSettings(this.status, data);
     }
 
     addusercb(result) {
@@ -629,8 +705,21 @@ class Settings extends React.Component {
                         </div>
                     </div>
                 </form>
-
-
+                <div className="row">
+                    <div className="col">
+                        <h4 className="text-light mb-2 text-center">
+                            Template Variables
+                            </h4>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <Variables
+                            settings={this.props.settings}
+                            callback={this.status}
+                        />
+                    </div>
+                </div>
             </div>
         )
     }

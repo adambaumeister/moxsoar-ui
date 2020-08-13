@@ -495,6 +495,37 @@ export default class Moxsoar {
             )
     }
 
+    AddVariable(cb, k, v) {
+        var r = new MoxsoarResponse();
+        var b = {
+            "key": k,
+            "value": v
+        }
+        fetch("/api/settings/variable", {
+            method: 'POST',
+            body: JSON.stringify(b)
+        })
+            .then(function (response) {
+                r.SetResponse(response);
+                if (!response.ok) {
+                    throw "Failed to update settings."
+                } else {
+                    return response.json()
+                }
+            })
+            .then(
+                (result) => {
+                    r.SetJson(result);
+                    cb(r);
+                },
+
+                (error) => {
+                    r.SetError(error);
+                    cb(r);
+                }
+            )
+    }
+
     DeleteIntegration(cb, packName, integrationName) {
         var r = new MoxsoarResponse();
         fetch("/api/packs/" + packName + "/" + integrationName, {
