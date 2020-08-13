@@ -1,9 +1,7 @@
 import React from 'react';
 import Moxsoar from '../api/moxsoar';
-import ReactJson from 'react-json-view';
-import XMLViewer from 'react-xml-viewer';
 import { TrashFill } from 'react-bootstrap-icons';
-import { RadioButtons, TextInput, TextAreaInput, StatusBar, SelectInput, ToggleButton, GenericSubmitButton } from './Core'
+import { RadioButtons, TextInput, StatusBar, SelectInput, ToggleButton, GenericSubmitButton } from './Core'
 
 import AceEditor from 'react-ace';
 import "ace-builds/src-noconflict/mode-xml";
@@ -13,11 +11,6 @@ import "ace-builds/src-noconflict/mode-json";
 import "ace-builds/src-noconflict/theme-github";
 import "ace-builds/src-noconflict/theme-monokai";
 
-
-import JSONInput from 'react-json-editor-ajrm';
-import locale from 'react-json-editor-ajrm/locale/en';
-
-
 import './core.css';
 
 function getFileType(fileName) {
@@ -25,13 +18,12 @@ function getFileType(fileName) {
     return res[1];
 }
 
-
 class Method extends React.Component {
     render() {
         var res = getFileType(this.props.method.ResponseFile);
 
         var output;
-        if (res == "json") {
+        if (res === "json") {
 
             var j = JSON.parse(this.props.method.ResponseString);
 
@@ -58,7 +50,7 @@ class Method extends React.Component {
                     }}
                 />
             </div>
-        } else if (res == "xml") {
+        } else if (res === "xml") {
             output = <div className="col">
                 <AceEditor
                     mode="xml"
@@ -108,6 +100,17 @@ class Method extends React.Component {
                     />
                 </div>
         }
+        var regexRow;
+        if (this.props.method.MatchRegex) {
+            regexRow = <div className="row">
+                <div className="col">
+                    <h5 className="text-warning">{this.props.method.MatchRegex}</h5>
+                </div>
+            </div>
+        } else {
+            regexRow = ""
+        }
+
         return (
             <div>
                 <div className="row">
@@ -121,8 +124,8 @@ class Method extends React.Component {
                             {this.props.method.ResponseCode}
                         </h5>
                     </div>
-
                 </div>
+                {regexRow}
                 <div className="row">
                     {output}
                 </div>
@@ -282,7 +285,7 @@ class AddRouteForm extends React.Component {
     }
 
     parseFileInput(value) {
-        var pattern = new RegExp('(\.json|\.xml|\.txt|\.html)');
+        var pattern = new RegExp('(.json|.xml|.txt|.html)');
         if (pattern.test(value)) {
             this.setState({
                 fileInputClass: "bg-success",
@@ -382,7 +385,7 @@ class AddRouteForm extends React.Component {
         r.filename = data.get("filename");
         r.method = data.get("method");
         r.responsestring = data.get("responsestring");
-
+        r.matchregex = data.get("matchregex")
         m.AddRoute(this.props.statuscb, this.props.packName, this.props.integrationName, r);
 
     }
@@ -455,6 +458,11 @@ class AddRouteForm extends React.Component {
                         {this.state.responseInput}
                     </div>
                     <input type="hidden" name="responsestring" value={this.state.responsestring} />
+                </div>
+                <div className="row">
+                    <div className="col text-center">
+                        <TextInput displayName="Regex Match (optional)" fieldName="matchregex" />
+                    </div>
                 </div>
                 <div className="row mb-2">
                     <div className="col text-center">

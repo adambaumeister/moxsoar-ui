@@ -306,16 +306,23 @@ export default class Moxsoar {
     }
 
     AddRoute(cb, packName, integrationName, route) {
+
+        var method = {
+            "HttpMethod": route.method,
+            "ResponseFile": route.filename,
+            "ResponseCode": route.responsecode,
+            "ResponseString": route.responsestring,
+        }
+
+        if (route.matchregex) {
+            method["MatchRegex"] = route.matchregex
+        }
+        console.log(method)
         var b = {
             "Route": {
                 "Path": route.path,
                 "Methods": [
-                    {
-                        "HttpMethod": route.method,
-                        "ResponseFile": route.filename,
-                        "ResponseCode": route.responsecode,
-                        "ResponseString": route.responsestring
-                    }
+                        method
                 ]
             }
         }
@@ -465,6 +472,69 @@ export default class Moxsoar {
         }
         fetch("/api/settings", {
             method: 'POST',
+            body: JSON.stringify(b)
+        })
+            .then(function (response) {
+                r.SetResponse(response);
+                if (!response.ok) {
+                    throw "Failed to update settings."
+                } else {
+                    return response.json()
+                }
+            })
+            .then(
+                (result) => {
+                    r.SetJson(result);
+                    cb(r);
+                },
+
+                (error) => {
+                    r.SetError(error);
+                    cb(r);
+                }
+            )
+    }
+
+    AddVariable(cb, k, v) {
+        var r = new MoxsoarResponse();
+        var b = {
+            "key": k,
+            "value": v
+        }
+        fetch("/api/settings/variable", {
+            method: 'POST',
+            body: JSON.stringify(b)
+        })
+            .then(function (response) {
+                r.SetResponse(response);
+                if (!response.ok) {
+                    throw "Failed to update settings."
+                } else {
+                    return response.json()
+                }
+            })
+            .then(
+                (result) => {
+                    r.SetJson(result);
+                    cb(r);
+                },
+
+                (error) => {
+                    r.SetError(error);
+                    cb(r);
+                }
+            )
+    }
+
+    DeleteVariable(cb, k) {
+        var r = new MoxsoarResponse();
+        var b = {
+            "key": k,
+        }
+
+        console.log(b)
+        fetch("/api/settings/variable", {
+            method: 'DELETE',
             body: JSON.stringify(b)
         })
             .then(function (response) {
