@@ -501,6 +501,57 @@ class AddVariableForm extends React.Component {
     }
 }
 
+class VariableDeleteButton extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.deleteVariable = this.deleteVariable.bind(this);
+    }
+
+    deleteVariable() {
+        var m = new Moxsoar();
+        m.DeleteVariable(this.props.callback, this.props.varkey)
+    }
+
+    render() {
+        return (
+            <TrashFill
+                size={40}
+                className="icon text-danger"
+                onClick={this.deleteVariable}
+            />
+        )
+    }
+}
+
+class Variable extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.submit = this.submit.bind(this);
+    }
+
+    submit(e) {
+        e.preventDefault();
+        var m = new Moxsoar();
+        var data = new FormData(e.target);
+        m.AddVariable(this.props.callback, this.props.varkey, data.get(this.props.varkey));
+    }
+
+    render() {
+        return (
+            <form onSubmit={this.submit}>
+                <TextInput
+                    key={this.props.varkey}
+                    fieldName={this.props.varkey}
+                    placeholder={this.props.varvalue}
+                />
+            </form>
+
+        )
+    }
+}
+
 class Variables extends React.Component {
     constructor(props) {
         super(props);
@@ -509,15 +560,26 @@ class Variables extends React.Component {
     render() {
         var rows = [];
         var variables = this.props.settings['Variables']
-
+        var cb = this.props.callback;
         Object.keys(variables).map(function (k, v) {
 
             rows.push(
-                <TextInput
-                    key={k}
-                    fieldName={k}
-                    placeholder={variables[k]}
-                />
+                <div className="row" key={v}>
+                    <div className="col">
+                        <Variable
+                            varkey={k}
+                            varvalue={variables[k]}
+                            callback={cb}
+                        />
+                    </div>
+                    <div className="col-1 p-0">
+                        <VariableDeleteButton
+                            callback={cb}
+                            varkey={k}
+                        />
+                    </div>
+                </div>
+
             )
         })
 
