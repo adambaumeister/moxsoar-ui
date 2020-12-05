@@ -381,6 +381,15 @@ class AddRouteForm extends React.Component {
         var m = new Moxsoar();
         var r = {};
         r.path = data.get("path");
+        if (r.path === "") {
+            // Error if path is undefined
+            var resultObj = {
+                failed: true,
+                error: "Path must be provided."
+            }
+            this.props.statuscb(resultObj);
+            return;
+        }
         r.responsecode = parseInt(data.get("responsecode"));
         r.filename = data.get("filename");
         r.method = data.get("method");
