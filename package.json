@@ -17,7 +17,7 @@
     "react-dom": "^16.13.1",
     "react-json-editor-ajrm": "^2.5.9",
     "react-json-view": "^1.19.1",
-    "react-scripts": "3.4.1",
+    "react-scripts": "5.0.1",
     "react-tooltip": "^4.2.8",
     "react-transition-group": "^1.2.1",
     "react-xml-viewer": "^1.0.3",
